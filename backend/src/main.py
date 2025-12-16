@@ -1,0 +1,87 @@
+"""
+My Personal Examiner - Backend API
+
+PhD-level A-Level Teaching & Examination System
+
+Phase I: Core Infrastructure & Database
+"""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# Application metadata
+app = FastAPI(
+    title="My Personal Examiner API",
+    description="PhD-level A-Level Teaching & Examination System - Core Infrastructure",
+    version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
+
+# CORS middleware (Phase IV - Frontend integration)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Next.js frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Health check endpoint
+@app.get("/", tags=["health"])
+async def root() -> dict[str, str]:
+    """
+    Root endpoint - Health check
+
+    Returns application status and version.
+    """
+    return {
+        "message": "My Personal Examiner API",
+        "status": "running",
+        "version": "0.1.0",
+        "phase": "Phase I - Core Infrastructure",
+    }
+
+
+@app.get("/health", tags=["health"])
+async def health_check() -> dict[str, str]:
+    """
+    Health check endpoint
+
+    Used by monitoring systems to verify API is operational.
+    """
+    return {"status": "healthy"}
+
+
+# Application lifecycle events
+@app.on_event("startup")
+async def startup_event() -> None:
+    """
+    Application startup event
+
+    Initialize connections, load configurations, etc.
+    """
+    print("🚀 My Personal Examiner API starting up...")
+    print("📚 Phase I: Core Infrastructure & Database")
+
+
+@app.on_event("shutdown")
+async def shutdown_event() -> None:
+    """
+    Application shutdown event
+
+    Clean up connections, close resources, etc.
+    """
+    print("👋 My Personal Examiner API shutting down...")
+
+
+# Router registration
+# Phase 3 (US1): Authentication (register)
+from src.routes import auth
+
+app.include_router(auth.router, prefix="/api", tags=["authentication"])
+
+# Phase 5 (US3): app.include_router(subjects.router, prefix="/api", tags=["subjects"])
+# Phase 6 (US4): app.include_router(students.router, prefix="/api", tags=["students"])
