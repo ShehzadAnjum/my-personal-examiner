@@ -1,0 +1,355 @@
+openapi: 3.1.0
+info:
+  title: My Personal Examiner API - Phase I
+  description: PhD-level A-Level Teaching & Examination System - Core Infrastructure
+  version: 0.1.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://api.mypersonalexaminer.com
+    description: Production (Phase IV)
+
+tags:
+  - name: authentication
+    description: Student registration and login
+  - name: students
+    description: Student profile management
+  - name: subjects
+    description: Available A-Level subjects
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/auth/register:
+    post:
+      tags: [authentication]
+      summary: Register new student account
+      description: Create a new student account with email and password
+      operationId: registerStudent
+      security: []  # No authentication required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              valid:
+                value:
+                  email: "student@example.com"
+                  password: "SecurePass123"
+                  full_name: "John Doe"
+      responses:
+        '201':
+          description: Student account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '400':
+          description: Validation error (invalid email, password too short)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidEmail:
+                  value:
+                    detail: "Invalid email format"
+                weakPassword:
+                  value:
+                    detail: "Password must be at least 8 characters"
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicate:
+                  value:
+                    detail: "Email already registered"
+
+  /api/auth/login:
+    post:
+      tags: [authentication]
+      summary: Authenticate student
+      description: Login with email and password, receive JWT token
+      operationId: loginStudent
+      security: []  # No authentication required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              valid:
+                value:
+                  email: "student@example.com"
+                  password: "SecurePass123"
+      responses:
+        '200':
+          description: Authentication successful, JWT token returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidCredentials:
+                  value:
+                    detail: "Invalid email or password"
+
+  /api/students/me:
+    get:
+      tags: [students]
+      summary: Get current student profile
+      description: Retrieve authenticated student's profile data
+      operationId: getCurrentStudent
+      responses:
+        '200':
+          description: Student profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '401':
+          description: Unauthorized (invalid or expired token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags: [students]
+      summary: Update current student profile
+      description: Update authenticated student's profile (full_name, target_grades)
+      operationId: updateCurrentStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentUpdate'
+            examples:
+              updateName:
+                value:
+                  full_name: "Jane Smith"
+              updateGrades:
+                value:
+                  target_grades:
+                    "9708": "A*"
+                    "9706": "A"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/subjects:
+    get:
+      tags: [subjects]
+      summary: List available subjects
+      description: Get list of all available A-Level subjects
+      operationId: listSubjects
+      responses:
+        '200':
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from /api/auth/login
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - full_name
+      properties:
+        email:
+          type: string
+          format: email
+          example: "student@example.com"
+          description: Student email address (must be unique)
+        password:
+          type: string
+          minLength: 8
+          example: "SecurePass123"
+          description: Password (minimum 8 characters)
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "John Doe"
+          description: Student's full name
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "student@example.com"
+        password:
+          type: string
+          example: "SecurePass123"
+
+    TokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: JWT access token
+        token_type:
+          type: string
+          example: "bearer"
+          description: Token type (always "bearer")
+        expires_in:
+          type: integer
+          example: 86400
+          description: Token expiration in seconds (24 hours)
+
+    StudentResponse:
+      type: object
+      required:
+        - id
+        - email
+        - full_name
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+          description: Unique student identifier
+        email:
+          type: string
+          format: email
+          example: "student@example.com"
+        full_name:
+          type: string
+          example: "John Doe"
+        target_grades:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+          example:
+            "9708": "A*"
+            "9706": "A"
+          description: Target grades by subject code
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-12-16T10:00:00Z"
+
+    StudentUpdate:
+      type: object
+      properties:
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Jane Smith"
+          description: Updated full name (optional)
+        target_grades:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+          example:
+            "9708": "A*"
+          description: Updated target grades (optional)
+
+    SubjectResponse:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - level
+        - exam_board
+        - syllabus_year
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          example: "9708"
+          description: Cambridge subject code
+        name:
+          type: string
+          example: "Economics"
+        level:
+          type: string
+          enum: [AS, A]
+          example: "A"
+          description: AS or A-Level
+        exam_board:
+          type: string
+          example: "Cambridge International"
+        syllabus_year:
+          type: string
+          example: "2023-2025"
+          description: Syllabus version years
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          example: "Invalid email or password"
+          description: Human-readable error message
