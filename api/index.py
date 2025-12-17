@@ -14,5 +14,4 @@ sys.path.insert(0, str(backend_dir))
 
 from src.main import app
 
-# Vercel expects this handler
-handler = app
+# Vercel's @vercel/python supports ASGI directly - just export 'app'
