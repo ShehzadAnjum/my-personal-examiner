@@ -3,6 +3,7 @@ Simple test endpoint to verify Vercel deployment works
 """
 
 from fastapi import FastAPI
+from mangum import Mangum
 
 app = FastAPI()
 
@@ -17,5 +18,5 @@ def health():
     return {"status": "healthy"}
 
 
-# Vercel handler
-handler = app
+# Vercel handler (ASGI via Mangum)
+handler = Mangum(app)
