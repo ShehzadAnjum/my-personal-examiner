@@ -97,6 +97,81 @@ Fetching latest Economics 9708 syllabus from Cambridge International website...
 
 ---
 
+## 🔄 Constitutional Requirements for Reusable Intelligence
+
+### STRICT RULES (User Requirements - 2025-12-18)
+
+#### 1. Always Check Before Creating
+**Before performing any specific task:**
+- ✅ Check if agent/subagent/skill/MCP server already exists
+- ✅ If exists, USE IT (don't recreate)
+- ✅ If doesn't exist, CREATE IT for reuse
+
+#### 2. Always Announce Usage
+**Format**: `📢 ANNOUNCING: Using Agent XX - [Name]`
+**Example**: `📢 ANNOUNCING: Using Agent 09 - Deployment`
+
+- Announce at start of EVERY task
+- Announce which agent/subagent/skill is being utilized
+- If creating new RI artifact, announce creation
+
+#### 3. Create Reusable Intelligence
+**When to create:**
+- Same skill needed repeatedly → Make it permanent skill
+- Same debugging pattern → Document in subagent
+- Architectural decision → Create/update ADR
+- Important interaction → Create/update PHR
+
+#### 4. Always Update After Learning
+**After debugging regressively:**
+- Update relevant agent/subagent/skill with lessons learned
+- Document pitfalls in skill
+- Update troubleshooting section
+
+**After critical decisions:**
+- Update ADRs if architectural significance detected
+- Use `/sp.adr <title>` command
+
+**After every user interaction:**
+- Create PHR using `/sp.phr` command
+- Record prompt and response verbatim
+
+#### 5. Use SpecKitPlus Commands
+**MANDATORY commands to use:**
+- `/sp.phr` - After every significant user interaction
+- `/sp.adr` - For architectural decisions
+- `/sp.git.commit_pr` - For git operations
+- `/sp.checklist` - When custom checklists needed
+- `/sp.specify`, `/sp.plan`, `/sp.tasks` - For feature work
+
+#### 6. Workflow Enforcement
+**Before any task:**
+1. Check constitution compliance
+2. Check if agent/subagent/skill exists
+3. Announce which RI artifact you're using
+4. Perform task
+5. Update RI artifacts with learnings
+6. Create PHR/ADR if needed
+7. Commit using `/sp.git.commit_pr`
+
+#### 7. RI Artifact Locations
+- Agents: `.claude/agents/NN-name.md` (10 total)
+- Subagents: `.claude/subagents/name.md` (18+ total)
+- Skills: `.claude/skills/name.md` (13+ total)
+- Commands: `.claude/commands/sp.*.md` (11 total)
+- ADRs: `history/adr/NNN-title.md`
+- PHRs: `history/prompts/{constitution|feature|general}/NNN-title.*.prompt.md`
+
+#### 8. No Assumptions
+**NEVER assume solution from internal knowledge.**
+**ALWAYS:**
+- Use MCP tools for discovery
+- Run CLI commands to verify
+- Capture outputs and states
+- Document in RI artifacts
+
+---
+
 ## 📁 Project Structure
 
 This project follows **SpecKitPlus methodology** with **Reusable Intelligence**.
