@@ -16,25 +16,35 @@ from sqlmodel import Session, create_engine
 
 from src.config import get_settings
 
-settings = get_settings()
+# Lazy engine creation - only create when first accessed
+_engine = None
 
-# Database engine configuration
-# Uses connection pooling in production, NullPool in testing
-if settings.is_production:
-    engine = create_engine(
-        settings.database_url_str,
-        echo=False,  # Don't log SQL queries in production
-        pool_pre_ping=True,  # Verify connections before using
-        poolclass=QueuePool,
-        pool_size=10,
-        max_overflow=20,
-    )
-else:
-    engine = create_engine(
-        settings.database_url_str,
-        echo=settings.debug,  # Log SQL queries in debug mode
-        poolclass=NullPool,  # No pooling in development
-    )
+
+def get_engine():
+    """Get or create database engine (lazy initialization for serverless)"""
+    global _engine
+    if _engine is None:
+        settings = get_settings()
+        # Database engine configuration
+        # Uses connection pooling in production, NullPool in testing
+        if settings.is_production:
+            _engine = create_engine(
+                settings.database_url_str,
+                echo=False,  # Don't log SQL queries in production
+                pool_pre_ping=True,  # Verify connections before using
+                poolclass=QueuePool,
+                pool_size=10,
+                max_overflow=20,
+            )
+        else:
+            _engine = create_engine(
+                settings.database_url_str,
+                echo=settings.debug,  # Log SQL queries in debug mode
+                poolclass=NullPool,  # No pooling in development
+            )
+    return _engine
+
+
 
 
 def get_session() -> Generator[Session, None, None]:
@@ -56,7 +66,7 @@ def get_session() -> Generator[Session, None, None]:
         >>>     students = session.exec(select(Student)).all()
         >>>     return students
     """
-    with Session(engine) as session:
+    with Session(get_engine()) as session:
         try:
             yield session
             session.commit()
@@ -89,7 +99,7 @@ def init_db() -> None:
     from src.models.subject import Subject  # noqa: F401
     from src.models.syllabus_point import SyllabusPoint  # noqa: F401
 
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(get_engine())
 
 
 def drop_db() -> None:
@@ -101,4 +111,4 @@ def drop_db() -> None:
     """
     from sqlmodel import SQLModel
 
-    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.drop_all(get_engine())
