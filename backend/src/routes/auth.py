@@ -14,10 +14,12 @@ Constitutional Requirements:
 from fastapi import APIRouter, HTTPException, status
 
 from src.database import SessionDep
-from src.schemas.auth import RegisterRequest, StudentResponse
+from src.schemas.auth import LoginRequest, RegisterRequest, StudentResponse
+from src.services.auth_service import verify_password
 from src.services.student_service import (
     EmailAlreadyExistsError,
     create_student,
+    get_student_by_email,
     student_to_response,
 )
 
@@ -107,4 +109,75 @@ def register(
         )
 
 
-# POST /api/auth/login endpoint will be added in Phase 4 (US2)
+@router.post(
+    "/login",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Login to student account",
+    description="""
+    Authenticate student with email and password.
+
+    **Constitutional Requirements**:
+    - Password verified using bcrypt
+    - Returns student profile on success
+    - Does not reveal if email exists (security)
+
+    **Returns**:
+    - 200 OK: Login successful, returns student profile
+    - 401 Unauthorized: Invalid email or password
+    - 422 Unprocessable Entity: Invalid input format
+    """,
+)
+def login(
+    login_data: LoginRequest,
+    session: SessionDep,
+) -> StudentResponse:
+    """
+    Login to student account
+
+    Verifies email and password, returns student profile on success.
+    Uses constant-time comparison to prevent timing attacks.
+
+    Args:
+        login_data: Email and password
+        session: Database session (injected)
+
+    Returns:
+        StudentResponse: Student profile (no password_hash)
+
+    Raises:
+        HTTPException 401: Invalid email or password
+
+    Examples:
+        >>> # cURL test
+        >>> curl -X POST http://localhost:8000/api/auth/login \\
+        ...   -H "Content-Type: application/json" \\
+        ...   -d '{
+        ...     "email": "test@example.com",
+        ...     "password": "TestPass123"
+        ...   }'
+
+    Constitutional Compliance:
+        - Principle I: Password verified with bcrypt (constant-time)
+        - Security: Generic error message (doesn't reveal if email exists)
+        - FR-003: JWT tokens will be added in Phase 4
+
+    Security Notes:
+        - Does NOT reveal whether email exists (prevents enumeration)
+        - Uses constant-time password verification (prevents timing attacks)
+        - Intentionally slow (~300ms) to prevent brute force
+    """
+
+    # Find student by email
+    student = get_student_by_email(session, login_data.email)
+
+    # Verify password (or fail with generic message)
+    if student is None or not verify_password(login_data.password, student.password_hash):
+        # Generic error message (don't reveal if email exists)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
+    # Login successful - return student profile
+    return student_to_response(student)

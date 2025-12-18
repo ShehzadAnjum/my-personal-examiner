@@ -71,6 +71,50 @@ class RegisterRequest(BaseModel):
     }
 
 
+class LoginRequest(BaseModel):
+    """
+    Student login request
+
+    Used for POST /api/auth/login endpoint.
+
+    Attributes:
+        email: Student email address
+        password: Plain text password (will be verified against stored hash)
+
+    Examples:
+        >>> request = LoginRequest(
+        ...     email="john@example.com",
+        ...     password="SecurePass123"
+        ... )
+
+    Constitutional Compliance:
+        - FR-001: Email validation (EmailStr ensures valid format)
+        - FR-002: Password minimum 8 characters
+    """
+
+    email: EmailStr = Field(
+        ...,
+        description="Student email address",
+        examples=["student@example.com"],
+    )
+
+    password: str = Field(
+        ...,
+        min_length=8,
+        description="Password (minimum 8 characters)",
+        examples=["SecurePass123"],
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "email": "student@example.com",
+                "password": "SecurePass123",
+            }
+        }
+    }
+
+
 class StudentResponse(BaseModel):
     """
     Student profile response

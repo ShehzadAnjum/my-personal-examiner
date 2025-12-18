@@ -73,6 +73,9 @@ omit = [
     "*/tests/*",
     "*/alembic/*",
     "*/__init__.py",
+    # Phase II models (not implemented yet in Phase I)
+    "src/models/subject.py",
+    "src/models/syllabus_point.py",
 ]
 
 [tool.coverage.report]
@@ -121,3 +124,11 @@ ignore_missing_imports = true
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+]
