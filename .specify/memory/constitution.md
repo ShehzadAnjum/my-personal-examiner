@@ -20,7 +20,7 @@ CHANGES MADE:
 6. Established SpecKit workflow integration
 7. Defined repository structure and hygiene rules
 
-PRINCIPLES (8 Non-Negotiable - NEW):
+PRINCIPLES (11 Non-Negotiable):
 1. Subject Accuracy is Non-Negotiable
 2. A* Standard Marking Always
 3. Syllabus Synchronization First
@@ -29,6 +29,9 @@ PRINCIPLES (8 Non-Negotiable - NEW):
 6. Feedback is Constructive and Detailed
 7. Phase Boundaries Are Hard Gates
 8. Question Bank Quality Over Quantity
+9. SpecKitPlus Workflow Compliance (NEW 2025-12-18)
+10. Official Skills Priority (NEW 2025-12-18)
+11. CLAUDE.md Hierarchy (NEW 2025-12-18)
 
 SPECKIT WORKFLOW:
 Constitution → Spec → Clarify (optional) → Plan → Tasks → Implementation → Capstone
@@ -64,8 +67,8 @@ docs: create constitution v1.0.0 (8 principles + 5-phase workflow)
 # My Personal Examiner: Project Constitution
 
 **Created**: December 16, 2025
-**Version**: 1.0.0
-**Last Amended**: 2025-12-16
+**Version**: 2.0.0
+**Last Amended**: 2025-12-18
 **Project**: My Personal Examiner - PhD-Level A-Level Teaching & Examination System
 **Objective**: Create automated, personalized PhD-level teacher for Cambridge International A-Levels achieving A* grades
 
@@ -553,6 +556,195 @@ CREATE TABLE questions (
 - Cambridge past papers: https://pastpapers.papacambridge.com/papers/caie/as-and-a-level-economics-9708
 - Official syllabus: https://www.cambridgeinternational.org/Images/595463-2023-2025-syllabus.pdf
 - Grade thresholds: Published after each examination session
+
+---
+
+### Principle IX: SpecKitPlus Workflow Compliance (NEW - 2025-12-18)
+
+**Rule**: ALL features MUST follow the SpecKitPlus command sequence exactly. NO code implementation before spec exists.
+
+**Mandatory Sequence**:
+```
+1. /sp.specify <feature>    → Create specs/<feature>/spec.md
+2. /sp.clarify              → Identify edge cases (if needed)
+3. /sp.plan                 → Create specs/<feature>/plan.md
+4. /sp.tasks                → Create specs/<feature>/tasks.md
+5. /sp.implement            → Execute tasks from tasks.md
+6. /sp.adr <title>          → Document architectural decisions
+7. /sp.phr                  → Record prompt history
+8. /sp.git.commit_pr        → Commit with constitutional compliance
+```
+
+**What This Means**:
+- NEVER write code before spec.md exists
+- NEVER skip clarify/plan/tasks steps
+- ALWAYS use `/sp.*` commands (not manual file creation)
+- ALWAYS create PHR after significant user interactions
+- ALWAYS create ADR for architectural decisions
+
+**Why This Matters**:
+- Prevents scope creep and undocumented requirements
+- Ensures all decisions are traced and justified
+- Maintains spec-code alignment (what was intended vs what was built)
+- Enables AI handoff (next session has full context)
+- **Result**: Maintainable, documented, constitutional code
+
+**Enforcement**:
+- **Automated**:
+  - Git hook: Check if spec.md exists before allowing code commits
+  - CI/CD: Verify spec/plan/tasks exist for each feature
+  - Phase gate: Check PHR and ADR counts match feature count
+- **Manual**:
+  - Pre-commit checklist: "Did you run /sp.specify first?"
+  - Code review: Reject PRs without linked spec
+  - Weekly audit: Verify all features have spec/plan/tasks
+- **AI**:
+  - Claude refuses to implement code without spec reference
+  - Prompts require `@specs/<feature>/spec.md` citation
+  - Creates PHR automatically after user interactions
+
+**SpecKitPlus Resources**:
+- Official Docs: https://ai-native.panaversity.org/docs/SDD-RI-Fundamentals/spec-kit-plus-hands-on
+- Workflow Guide: docs/METHODOLOGY_CORRECTIONS.md
+
+**Phase I Violation**: Implemented without spec workflow (CORRECTED 2025-12-18)
+**Phase II Forward**: Strict adherence mandatory—no exceptions
+
+---
+
+### Principle X: Official Skills Priority (NEW - 2025-12-18)
+
+**Rule**: BEFORE creating ANY custom skill, check Anthropic's official skills catalog. ONLY create custom skills if no official alternative exists.
+
+**Checking Process**:
+```
+1. Identify task requiring skill
+2. Check official catalog: https://github.com/anthropics/skills
+3. If official skill exists → USE IT
+4. If no official skill → Document why, then create custom
+5. Document rationale in custom skill frontmatter
+```
+
+**Official Skills Catalog** (16 available as of 2025-12-18):
+- **Document Skills**: docx, pdf, pptx, xlsx (source-available)
+- **Development**: web-artifacts-builder, webapp-testing, mcp-builder
+- **Creative**: algorithmic-art, brand-guidelines, canvas-design
+- **Workflow**: doc-coauthoring, skill-creator, internal-comms
+- **Others**: frontend-design, slack-gif-creator, theme-factory
+
+**What This Means**:
+- Use `web-artifacts-builder` for UI work (not custom React skill)
+- Use `xlsx` for analytics/exports (not custom spreadsheet skill)
+- Use `pdf` for PDF reading (not custom PDF parser)
+- Use `webapp-testing` for E2E tests (not custom Playwright skill)
+- Use `mcp-builder` for MCP servers (not custom builder)
+- Use `docx` for Word documents (not custom document skill)
+
+**Why This Matters**:
+- Prevents duplication of effort
+- Leverages Anthropic's maintained skills
+- Reduces custom code to maintain
+- Official skills get updates and bug fixes
+- **Result**: Reuse official skills, focus on domain-specific skills
+
+**Enforcement**:
+- **Automated**:
+  - Pre-skill-creation hook: "Did you check official catalog?"
+  - Skill lint: Verify custom skill has justification comment
+  - Monthly audit: Review custom skills for obsolescence
+- **Manual**:
+  - Before creating skill: Search github.com/anthropics/skills
+  - Code review: Challenge custom skills without justification
+  - Quarterly review: Consolidate or remove redundant custom skills
+- **AI**:
+  - Claude asks: "Did you check official catalog first?"
+  - Refuses to create skill without catalog search confirmation
+  - Suggests official skills when detecting common patterns
+
+**Custom Skills Review** (Phase I - 2025-12-18):
+- All 13 custom skills validated as domain-specific
+- No overlaps with official catalog found
+- Skills kept: vercel-fastapi-deployment, sqlmodel-database-schema-design,
+  fastapi-route-implementation, multi-tenant-query-pattern,
+  pydantic-schema-validation, bcrypt-password-hashing,
+  subject-economics-9708, cambridge-exam-patterns,
+  a-star-grading-rubrics, phd-pedagogy,
+  uv-package-management, alembic-migration-creation,
+  pytest-testing-patterns
+
+---
+
+### Principle XI: CLAUDE.md Hierarchy (NEW - 2025-12-18)
+
+**Rule**: NO single CLAUDE.md file shall exceed 300 lines. Use hierarchical CLAUDE.md structure (root + phase/feature subdirectories).
+
+**Hierarchical Structure**:
+```
+/CLAUDE.md                                     # Project-wide only (<300 lines)
+/specs/phase-N-*/CLAUDE.md                    # Phase-specific (<300 lines each)
+/specs/features/<feature>/CLAUDE.md           # Feature-specific (if needed)
+```
+
+**Root CLAUDE.md Should Contain** (project-wide only):
+- Project overview (1-2 paragraphs)
+- Technology stack (locked choices)
+- Constitutional reference (link to this document)
+- SpecKitPlus workflow reminder
+- Official skills catalog reference
+- Where to find phase/feature-specific instructions
+
+**Phase-Specific CLAUDE.md Should Contain**:
+- Phase objectives and deliverables
+- Phase-specific patterns and conventions
+- Phase-specific security requirements
+- Phase-specific testing requirements
+- Phase-specific agent/subagent/skill usage
+- Phase-specific lessons learned
+- Phase gate requirements
+
+**Feature-Specific CLAUDE.md** (only if feature is complex):
+- Feature scope and boundaries
+- Feature-specific patterns
+- Feature-specific testing strategy
+- Dependencies and integrations
+
+**What This Means**:
+- Root CLAUDE.md: Generic project instructions
+- Phase CLAUDE.md: "How to build authentication", "How to extract PDFs"
+- Feature CLAUDE.md: "How Economics 9708 marking works"
+- NEVER let CLAUDE.md files grow beyond 300 lines (split earlier if complex)
+
+**Why This Matters**:
+- Prevents monolithic documentation (936-line CLAUDE.md)
+- Improves discoverability (phase-specific instructions)
+- Reduces cognitive load (read only what's relevant)
+- Enables parallel development (different phases, different docs)
+- **Result**: Maintainable, scalable documentation
+
+**Enforcement**:
+- **Automated**:
+  - Pre-commit hook: Check CLAUDE.md line count (<300)
+  - CI/CD: Fail build if any CLAUDE.md exceeds 300 lines
+  - Monthly audit: Verify hierarchy structure
+- **Manual**:
+  - Before phase start: Create phase-specific CLAUDE.md
+  - Code review: Check if root CLAUDE.md is growing (split if >250)
+  - Quarterly review: Prune obsolete phase CLAUDE.md files
+- **AI**:
+  - Claude prompts: "Read specs/phase-N-*/CLAUDE.md for phase-specific instructions"
+  - Refuses to add to root CLAUDE.md if already >250 lines
+  - Suggests creating phase/feature CLAUDE.md when appropriate
+
+**Phase I Violation**: Created monolithic 936-line root CLAUDE.md (CORRECTED 2025-12-18)
+**Current Structure** (post-correction):
+- Root CLAUDE.md: 228 lines ✅
+- specs/phase-1-core-infrastructure/CLAUDE.md: 285 lines ✅
+- specs/phase-2-question-bank/CLAUDE.md: To be created ⏳
+
+**AGENTS.md Alternative**:
+- Per official docs, AGENTS.md can contain universal agent instructions
+- CLAUDE.md contains Claude Code-specific context
+- Use both for separation of concerns (optional)
 
 ---
 
