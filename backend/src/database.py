@@ -80,6 +80,9 @@ def get_session() -> Generator[Session, None, None]:
 # Type alias for dependency injection
 SessionDep = Annotated[Session, Depends(get_session)]
 
+# Alias for get_session (for consistency across codebase)
+get_db = get_session
+
 
 def init_db() -> None:
     """

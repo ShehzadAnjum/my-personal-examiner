@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "rubric_type": "level_descriptors",
+  "max_levels": 4,
+  "essay_structure": true,
+  "subject_code": "9708",
+  "subject_name": "Economics",
+  "levels": [
+    {
+      "level": 4,
+      "marks": "18-25",
+      "descriptor": "Sophisticated analysis showing good understanding of the question. Clear chain of reasoning with relevant economic theory and terminology. Effective evaluation with supported judgment. Diagrams used appropriately where relevant. Demonstrates ability to synthesize multiple concepts."
+    },
+    {
+      "level": 3,
+      "marks": "12-17",
+      "descriptor": "Good analysis with reasonable understanding. Some use of economic theory and terminology. Attempts at evaluation but may lack full support or depth. Diagrams may be present but not fully exploited. Shows competent application of concepts."
+    },
+    {
+      "level": 2,
+      "marks": "6-11",
+      "descriptor": "Some understanding but superficial or incomplete analysis. Limited use of economic theory. Little or undeveloped evaluation. Diagrams may be absent or poorly executed. Response shows basic comprehension but lacks development."
+    },
+    {
+      "level": 1,
+      "marks": "1-5",
+      "descriptor": "Limited understanding of the question. Mainly descriptive with little or no analysis. No real evaluation or judgment. Economic terminology largely absent or misused. Response may be largely irrelevant or brief."
+    }
+  ],
+  "keywords": [
+    "analysis",
+    "evaluation",
+    "economic theory",
+    "diagrams",
+    "synthesis",
+    "judgment",
+    "chain of reasoning",
+    "application"
+  ],
+  "marking_guidance": {
+    "essay_questions": {
+      "min_marks": 20,
+      "max_marks": 25,
+      "typical_structure": "Introduction → Analysis → Evaluation → Conclusion",
+      "required_elements": [
+        "Clear understanding of economic concepts",
+        "Application of theory to context",
+        "Use of diagrams (where appropriate)",
+        "Balanced evaluation of different viewpoints",
+        "Supported judgment or conclusion"
+      ]
+    },
+    "data_response_questions": {
+      "min_marks": 8,
+      "max_marks": 20,
+      "typical_structure": "Extract data → Apply theory → Brief evaluation",
+      "required_elements": [
+        "Reference to data/stimulus material",
+        "Application of relevant economic concepts",
+        "Clear explanation of relationships",
+        "Some evaluation (for higher mark questions)"
+      ]
+    }
+  },
+  "acceptable_variations": [
+    "Use of 'equilibrium' or 'market clearing' interchangeably",
+    "Different diagram labeling conventions (P/Q vs Price/Quantity)",
+    "Supply/demand shift vs supply/demand curve shift (contextually equivalent)",
+    "Real vs nominal values (if clarified in context)"
+  ],
+  "common_errors_to_penalize": [
+    "Confusing supply and demand shifts",
+    "Incorrect diagram labeling or missing labels",
+    "Stating conclusions without justification",
+    "Purely descriptive responses without analysis",
+    "Failure to reference stimulus material when required"
+  ],
+  "partial_credit_rules": {
+    "diagrams": {
+      "full_credit": "Correctly labeled diagram with clear explanation",
+      "partial_credit": "Diagram present but labels incomplete or explanation weak",
+      "no_credit": "Diagram absent when explicitly required or fundamentally incorrect"
+    },
+    "evaluation": {
+      "full_credit": "Balanced evaluation with supported judgment",
+      "partial_credit": "Some evaluation but one-sided or unsupported",
+      "no_credit": "No evaluation present or purely descriptive"
+    }
+  },
+  "notes": "This configuration represents Cambridge Economics 9708 marking standards for Papers 2 and 3 (2018-2023 syllabus). Level descriptors apply primarily to essay questions (typically 20-25 marks). Shorter questions may use simplified rubrics or mark schemes with specific point allocation."
+}

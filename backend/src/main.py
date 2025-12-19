@@ -80,8 +80,15 @@ async def shutdown_event() -> None:
 # Router registration
 # Phase 3 (US1): Authentication (register)
 from src.routes import auth
+from src.routes import exams
+from src.routes import questions
+from src.routes import subjects
+from src.routes import syllabus
 
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
+app.include_router(questions.router, tags=["questions"])  # Phase II US1: Upload & Storage
+app.include_router(exams.router, tags=["exams"])  # Phase II US6: Exam Generation
+app.include_router(syllabus.router, tags=["syllabus"])  # Phase II US7: Syllabus Tagging
+app.include_router(subjects.router, tags=["subjects"])  # Phase II: Subject listing
 
-# Phase 5 (US3): app.include_router(subjects.router, prefix="/api", tags=["subjects"])
 # Phase 6 (US4): app.include_router(students.router, prefix="/api", tags=["students"])
