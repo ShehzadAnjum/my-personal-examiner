@@ -1,0 +1,306 @@
+openapi: 3.0.3
+info:
+  title: Planner Agent API
+  description: Study schedule generation with SuperMemo 2 and contextual interleaving
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+
+paths:
+  /planning/create-schedule:
+    post:
+      summary: Create personalized study plan
+      description: |
+        Generate n-day study schedule using SuperMemo 2 spaced repetition
+        and contextual interleaving (max 3 related topics per day).
+      operationId: createStudySchedule
+      tags:
+        - Planning
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subject_id
+                - exam_date
+                - hours_per_day
+                - student_id
+              properties:
+                subject_id:
+                  type: string
+                  format: uuid
+                  description: Subject to create plan for
+                exam_date:
+                  type: string
+                  format: date
+                  description: Target exam date
+                hours_per_day:
+                  type: number
+                  format: float
+                  minimum: 0.5
+                  maximum: 24
+                  description: Available study hours per day
+                student_id:
+                  type: string
+                  format: uuid
+                current_progress:
+                  type: array
+                  items:
+                    type: string
+                  description: Syllabus points already mastered (UUIDs)
+                weaknesses:
+                  type: array
+                  items:
+                    type: string
+                  description: Syllabus points to prioritize (from Reviewer)
+
+      responses:
+        '201':
+          description: Study plan created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan_id:
+                    type: string
+                    format: uuid
+                  total_days:
+                    type: integer
+                  schedule:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DaySchedule'
+                  easiness_factors:
+                    type: object
+                    description: Initial SM-2 EF per syllabus point
+                    additionalProperties:
+                      type: number
+                  syllabus_coverage:
+                    type: object
+                    properties:
+                      total_points:
+                        type: integer
+                      covered_in_plan:
+                        type: integer
+                      coverage_percentage:
+                        type: number
+                  estimated_completion_date:
+                    type: string
+                    format: date
+              example:
+                plan_id: "plan-789"
+                total_days: 30
+                schedule:
+                  - day: 1
+                    date: "2025-01-15"
+                    topics: ["9708.1.1", "9708.1.2"]
+                    interval: 1
+                    activities: ["study", "practice"]
+                    hours_allocated: 2.0
+                    ef: 2.5
+                    completed: false
+                  - day: 4
+                    date: "2025-01-18"
+                    topics: ["9708.1.1"]
+                    interval: 3
+                    activities: ["review"]
+                    hours_allocated: 1.0
+                    ef: 2.5
+                    completed: false
+                easiness_factors:
+                  "9708.1.1": 2.5
+                  "9708.1.2": 2.5
+                syllabus_coverage:
+                  total_points: 25
+                  covered_in_plan: 25
+                  coverage_percentage: 100
+                estimated_completion_date: "2025-02-14"
+
+  /planning/schedule/{plan_id}:
+    get:
+      summary: Get study plan details
+      description: Retrieve full schedule with progress tracking
+      operationId: getStudyPlan
+      tags:
+        - Planning
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Study plan retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan_id:
+                    type: string
+                    format: uuid
+                  schedule:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DaySchedule'
+                  progress:
+                    type: object
+                    properties:
+                      days_completed:
+                        type: integer
+                      total_days:
+                        type: integer
+                      percentage:
+                        type: number
+                  next_day:
+                    type: integer
+                    description: Next uncompleted day number
+                  status:
+                    type: string
+                    enum: [active, completed, abandoned]
+
+  /planning/schedule/{plan_id}/progress:
+    patch:
+      summary: Update plan progress
+      description: |
+        Mark day as completed and provide performance data.
+        Plan adapts SM-2 easiness factors based on actual performance.
+      operationId: updateProgress
+      tags:
+        - Planning
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - completed_day
+                - student_id
+              properties:
+                completed_day:
+                  type: integer
+                  description: Day number just completed
+                performance_data:
+                  type: object
+                  properties:
+                    topics_mastered:
+                      type: array
+                      items:
+                        type: string
+                      description: Syllabus point codes mastered
+                    practice_scores:
+                      type: object
+                      description: Percentage scores per topic
+                      additionalProperties:
+                        type: number
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: Progress updated, schedule adapted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_schedule:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DaySchedule'
+                    description: Remaining schedule (may be reoptimized)
+                  easiness_factors_updated:
+                    type: object
+                    description: Updated SM-2 EF values
+                    additionalProperties:
+                      type: number
+                  next_day:
+                    type: integer
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                    description: AI-generated study recommendations
+              example:
+                updated_schedule:
+                  - day: 4
+                    date: "2025-01-18"
+                    topics: ["9708.1.1", "9708.2.1"]
+                    interval: 3
+                    activities: ["review", "mixed_practice"]
+                    hours_allocated: 1.5
+                    ef: 2.7
+                    completed: false
+                easiness_factors_updated:
+                  "9708.1.1": 2.7
+                  "9708.1.2": 2.2
+                next_day: 4
+                recommendations:
+                  - "Great progress on 9708.1.1 (scored 95%) - EF increased to 2.7"
+                  - "9708.1.2 needs more practice (scored 65%) - EF adjusted to 2.2, extra review scheduled"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    DaySchedule:
+      type: object
+      properties:
+        day:
+          type: integer
+          description: Day number in plan (1-based)
+        date:
+          type: string
+          format: date
+          description: Calendar date (YYYY-MM-DD)
+        topics:
+          type: array
+          items:
+            type: string
+          description: Syllabus point codes to study (max 3 per day)
+        interval:
+          type: integer
+          description: SM-2 interval (days since last review)
+        activities:
+          type: array
+          items:
+            type: string
+            enum: [study, practice, review, mixed_review, mock_exam]
+          description: Learning activities for the day
+        hours_allocated:
+          type: number
+          format: float
+          description: Study hours allocated
+        ef:
+          type: number
+          format: float
+          minimum: 1.3
+          maximum: 2.5
+          description: SuperMemo 2 easiness factor
+        completed:
+          type: boolean
+          description: Whether day has been completed

@@ -1,0 +1,237 @@
+openapi: 3.0.3
+info:
+  title: Reviewer Agent API
+  description: Weakness analysis and A* model answer generation
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+
+paths:
+  /feedback/analyze-weaknesses:
+    post:
+      summary: Analyze student weaknesses from attempt
+      description: |
+        Identify categorized weaknesses (AO1/AO2/AO3) from marked exam attempt.
+        Creates actionable improvement plan with specific remediation tasks.
+      operationId: analyzeWeaknesses
+      tags:
+        - Feedback
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attempt_id
+                - student_id
+              properties:
+                attempt_id:
+                  type: string
+                  format: uuid
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: Weakness analysis complete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  improvement_plan_id:
+                    type: string
+                    format: uuid
+                  weaknesses:
+                    type: object
+                    properties:
+                      AO1:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WeaknessCategory'
+                      AO2:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WeaknessCategory'
+                      AO3:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WeaknessCategory'
+                  action_items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActionItem'
+                  progress_comparison:
+                    type: object
+                    description: Comparison to previous attempts (if any)
+                    properties:
+                      previous_attempt_id:
+                        type: string
+                        format: uuid
+                      improvements:
+                        type: array
+                        items:
+                          type: string
+                      persistent_weaknesses:
+                        type: array
+                        items:
+                          type: string
+              example:
+                improvement_plan_id: "plan-123"
+                weaknesses:
+                  AO1:
+                    - category: "Imprecise Definitions"
+                      examples:
+                        - "Question 2: Defined demand as 'what people want' instead of 'quantity willing and able to purchase'"
+                      severity: "high"
+                      syllabus_points: ["9708.2.1"]
+                  AO2:
+                    - category: "Weak Application"
+                      examples:
+                        - "Question 3: Used generic example 'some goods' instead of specific real-world case"
+                      severity: "medium"
+                      syllabus_points: ["9708.2.2"]
+                  AO3:
+                    - category: "No Evaluation"
+                      examples:
+                        - "Question 4: Listed arguments but no conclusion or weighing"
+                      severity: "high"
+                      syllabus_points: ["9708.3.1"]
+                action_items:
+                  - id: "action-1"
+                    action: "Memorize precise definitions for 10 core Economics terms"
+                    target_weakness: "AO1 - Imprecise Definitions"
+                    due_date: "2025-01-22"
+                    completed: false
+                    resources:
+                      - "9708 syllabus glossary"
+                      - "Teacher Agent: Explain concept for each term"
+
+  /feedback/generate-model-answer:
+    post:
+      summary: Generate A* model answer
+      description: |
+        Rewrite student answer to demonstrate A* standard.
+        Includes annotations showing differences and improvement points.
+      operationId: generateModelAnswer
+      tags:
+        - Feedback
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question_id
+                - student_answer
+              properties:
+                question_id:
+                  type: string
+                  format: uuid
+                student_answer:
+                  type: string
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: A* model answer generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_answer:
+                    type: string
+                    description: Rewritten answer at A* standard
+                  annotations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        section:
+                          type: string
+                        annotation:
+                          type: string
+                        improvement_shown:
+                          type: string
+                  comparison:
+                    type: string
+                    description: Side-by-side comparison with student answer
+                  key_improvements:
+                    type: array
+                    items:
+                      type: string
+                    description: List of key improvements made
+              example:
+                model_answer: "Demand is the quantity of a good consumers are willing and able to purchase at a given price, ceteris paribus. [✅ AO1: PRECISE DEFINITION + KEY TERM]..."
+                annotations:
+                  - section: "Definition"
+                    annotation: "✅ AO1: Precise definition with ceteris paribus"
+                    improvement_shown: "Added 'willing and able' + 'ceteris paribus' vs. student's 'what people want'"
+                  - section: "Explanation"
+                    annotation: "✅ AO2: Income and substitution effects explained"
+                    improvement_shown: "Provided theoretical framework vs. student's 'it goes down'"
+                comparison: "[STUDENT] Demand is what people want...\n[A* MODEL] Demand is the quantity of a good consumers are willing and able to purchase..."
+                key_improvements:
+                  - "Precise definition with ceteris paribus"
+                  - "Theoretical explanation (income/substitution effects)"
+                  - "Specific numerical example with data"
+                  - "Balanced evaluation with conclusion"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    WeaknessCategory:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Type of weakness
+        examples:
+          type: array
+          items:
+            type: string
+          description: Specific examples from student's answers
+        severity:
+          type: string
+          enum: [low, medium, high]
+        syllabus_points:
+          type: array
+          items:
+            type: string
+          description: Affected syllabus point codes
+
+    ActionItem:
+      type: object
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+          description: Specific improvement action
+        target_weakness:
+          type: string
+        due_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+        resources:
+          type: array
+          items:
+            type: string
+          description: Links to Teacher/Coach agents, syllabus resources

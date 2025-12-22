@@ -1,0 +1,222 @@
+ 1. Relationship Between /teach and /coaching
+
+  Different AI Roles for Different Learning Needs:
+
+  /teach (Teacher Agent - US1)
+  - Purpose: Comprehensive concept explanations
+  - When to use: Learning a new topic from scratch
+  - Teaching style: Structured, comprehensive
+  - Output: Definition → Key Terms → Explanation → Examples → Diagrams → Practice Problems
+  - Analogy: Like reading a textbook chapter written by a PhD professor
+
+  /coaching (Coach Agent - US2)
+  - Purpose: Personalized tutoring for difficult concepts
+  - When to use: Struggling with something you don't understand
+  - Teaching style: Socratic questioning, adaptive, conversational
+  - Output: Back-and-forth dialogue with diagnostic questions and targeted hints
+  - Analogy: Like a 1-on-1 tutoring session where the tutor asks questions to find your misconception
+
+  Example Learning Flow:
+
+  Student wants to learn PED (Price Elasticity of Demand)
+    ↓
+  1. Go to /teach → Select "9708.1.x - PED" → Get comprehensive explanation
+    ↓
+  2. Read explanation, still confused about "why PED is always negative"
+    ↓
+  3. Go to /coaching → Type "I don't understand why PED is negative"
+    ↓
+  4. Coach asks: "What happens to quantity demanded when price increases?"
+    ↓
+  5. Student: "It decreases"
+    ↓
+  6. Coach: "Great! Now what does the formula PED = %ΔQd / %ΔP tell us about the relationship?"
+    ↓
+  7. Conversation continues until student has breakthrough
+
+  Key Difference: Teacher = Broadcast (one explanation to many), Coach = Personalized (adapts to YOUR misconception)
+
+  ---
+  2. Resource Bank Integration (Phase II)
+
+  Yes! Exactly right. Here's how it will work:
+
+  Current Implementation (Phase III - What you have now):
+
+  Student requests explanation
+    ↓
+  LLM generates content from scratch every time
+    ↓
+  No local resources, relies on LLM's training data
+
+  Future Implementation (Phase II Complete):
+
+  Student requests explanation for "9708.1.1 - Scarcity"
+    ↓
+  1. CHECK RESOURCE BANK FIRST (backend/resources/subjects/9708/)
+     - Look for pre-written explanations
+     - Look for past paper questions on this topic
+     - Look for marking criteria for similar questions
+    ↓
+  2. If found: Use resource bank content as PRIMARY source
+     - Inject into LLM prompt as context
+     - LLM enhances/personalizes based on student history
+    ↓
+  3. If not found: Fall back to LLM generation
+     - LLM generates from training data
+     - Cache the good result to resource bank for future
+    ↓
+  4. ALWAYS check online resources LAST
+     - Only if resource bank empty AND LLM fails
+
+  Concrete Example (Phase II Architecture):
+
+  Teacher Agent Prompt (with Resource Bank):
+  # Phase III (current - no resource bank)
+  prompt = f"Explain {concept_name} for Economics 9708"
+
+  # Phase II (with resource bank)
+  prompt = f"""
+  Explain {concept_name} for Economics 9708.
+
+  REFERENCE MATERIALS FROM RESOURCE BANK:
+  - Past paper questions: {bank.get_questions(concept_id)}
+  - Mark schemes: {bank.get_mark_schemes(concept_id)}
+  - Examiner reports: {bank.get_examiner_notes(concept_id)}
+  - Previous explanations: {bank.get_cached_explanations(concept_id)}
+
+  Use these materials to create an accurate explanation.
+  """
+
+  Benefits:
+  1. Accuracy: Real Cambridge materials = 100% syllabus alignment
+  2. Speed: Cached explanations = instant load (no LLM call needed)
+  3. Cost: Fewer LLM tokens = lower API costs
+  4. Offline: Works even if LLM API is down
+
+  Resource Bank Structure (Phase II):
+  backend/resources/subjects/9708/
+  ├── syllabus/
+  │   ├── 9708.1.1-scarcity.md         # Pre-written explanations
+  │   └── 9708.1.2-opportunity-cost.md
+  ├── questions/
+  │   ├── 9708_s22_qp_31.pdf           # Past papers (uploaded)
+  │   └── extracted/
+  │       └── 9708_s22_qp_31_q1.json   # Extracted question data
+  ├── mark_schemes/
+  │   └── 9708_s22_ms_31.pdf
+  └── cache/
+      └── explanations/
+          └── 9708.1.1-scarcity-v1.json # Cached LLM responses
+
+  ---
+  3. Syllabus Loading Optimization (Your Key Insight!)
+
+  Current Problem (Why it's slow):
+
+  Looking at frontend/app/teach/page.tsx:161:
+  useEffect(() => {
+    async function fetchSyllabusPoints() {
+      setLoadingSyllabus(true);
+      const points = await getSyllabusPoints('9708');  // ← Network call EVERY time
+      setSyllabusPoints(points);
+      setLoadingSyllabus(false);
+    }
+    fetchSyllabusPoints();
+  }, []); // Runs on component mount
+
+  Issues:
+  1. ❌ Fetches from backend on every page load
+  2. ❌ No caching (loads 50+ syllabus points from PostgreSQL)
+  3. ❌ Slow database query (joins subjects table)
+  4. ❌ No offline support
+
+===========================================
+  1️⃣ Relationship between /teach and /coaching
+
+  | Feature | /teach (Teacher Agent)                 | /coaching (Coach Agent)  |
+  |---------|----------------------------------------|--------------------------|
+  | Purpose | Learn NEW topics                       | Get help when STUCK      |
+  | Style   | Structured, comprehensive              | Socratic, conversational |
+  | Output  | Full explanation + examples + practice | Back-and-forth dialogue  |
+  | Analogy | Reading a textbook                     | 1-on-1 tutoring session  |
+
+  Example Learning Flow:
+  Student wants to learn PED
+    ↓
+  1. /teach → Get comprehensive explanation
+    ↓
+  2. Still confused about "why PED is negative"
+    ↓
+  3. /coaching → Coach asks questions to find YOUR misconception
+    ↓
+  4. Breakthrough understanding through dialogue
+
+  2️⃣ Resource Bank Integration (Phase II)
+
+  YES! When Phase II is complete, both /teach and /coaching will:
+
+  1. Check Resource Bank FIRST:
+    - Pre-written explanations
+    - Past paper questions
+    - Cambridge mark schemes
+    - Examiner reports
+  2. Use LLM to Personalize:
+    - Inject resource bank content into prompt
+    - LLM adapts to student's history
+    - More accurate (Cambridge materials) + Personalized
+  3. Cache Good Results:
+    - Save LLM responses for future students
+    - Reduce API costs
+    - Enable offline mode
+
+  Resource Bank Structure:
+  backend/resources/subjects/9708/
+  ├── syllabus/           # Pre-written explanations
+  ├── questions/          # Past papers (uploaded)
+  ├── mark_schemes/       # Marking criteria
+  └── cache/              # Cached LLM responses
+
+  3️⃣ Syllabus Caching (IMPLEMENTED ✅)
+
+  Problem: Slow loading on every page visit (fetches 50+ items from database)
+
+  Solution: localStorage cache with smart sync
+
+  How it works:
+  1. First visit: Fetches from API, saves to cache (~1-2 seconds)
+  2. Second visit: Loads instantly from cache (<50ms) ⚡
+  3. After 24 hours: Shows cached data instantly, syncs in background
+  4. If API fails: Uses stale cache (offline mode)
+
+  Visual Indicator: Shows ⚡ Loaded from cache (instant) in sidebar
+
+  Test it now:
+  1. Navigate to http://localhost:3000/teach
+  2. Open DevTools Console (F12)
+  3. First load: See 🔄 No cache found, fetching from API...
+  4. Refresh page: See 📦 Loaded syllabus from cache (instant load) + ✅ Cache is fresh, skipping API call
+
+  ---
+  📚 Full Architecture Document
+
+  I created a comprehensive guide at:
+  /home/anjum/dev/my_personal_examiner/docs/TEACHING_ARCHITECTURE.md
+
+  Contains:
+  - Detailed explanation of Teacher vs Coach
+  - Resource bank integration strategy
+  - Syllabus caching implementation
+  - Full learning cycle (6 AI agents)
+  - Testing instructions
+  - Future roadmap
+
+  ---
+  🎯 What's Working Now
+
+  ✅ Coaching page - Messages persist correctly
+  ✅ Teaching page - Valid student ID configured
+  ✅ Syllabus caching - Instant load on repeat visits
+  ✅ localStorage optimization - Offline support
+
+  ---

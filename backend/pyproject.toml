@@ -22,7 +22,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     # AI Integration (Phase III+)
     "openai>=1.54.0",
-    "anthropic>=0.39.0",
+    "anthropic>=0.40.0",
+    "google-generativeai>=0.8.0",
     # PDF Processing (Phase II+)
     "pdfplumber>=0.11.0",
     "pypdf>=5.1.0",

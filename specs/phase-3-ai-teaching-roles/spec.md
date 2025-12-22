@@ -4,13 +4,24 @@
 **Created**: 2025-12-20
 **Phase**: III
 **Dependencies**: Phase II (Question Bank, Exam Generation)
-**Target**: Economics 9708 MVP with all 6 core roles working end-to-end
+**Target**: Economics 9708 Production v1.0 with all 6 core roles working end-to-end (not demo MVP - serious implementation)
 
 ---
 
 ## EXECUTIVE SUMMARY
 
 Implement the 6 core AI teaching roles (Teacher, Coach, Examiner, Marker, Reviewer, Planner) for Economics 9708, creating a fully automated, PhD-level learning system. Students will be able to learn topics, get tutoring help, take exams, receive strict marking, see improvement plans, and follow personalized study schedules.
+
+---
+
+## CLARIFICATIONS
+
+### Session 2025-12-20
+- Q: What structure should coaching_sessions.session_transcript JSONB field use? → A: Array of message objects ([{role: "student/coach", content: "...", timestamp: "..."}])
+- Q: How should the system handle LLM API failures (timeout, rate limit, outage)? → A: Retry with exponential backoff, fall back to cached/generic responses, then prompt user to try alternative LLM (e.g., Gemini)
+- Q: How should the system handle low-confidence marking results? → A: Flag low-confidence marks (<70%) for manual review, store confidence score with result
+- Q: Which spaced repetition algorithm should the Planner Agent use? → A: SuperMemo 2 (SM-2) with production-quality implementation (not MVP demo - this is serious v1.0)
+- Q: What interleaving strategy should the Planner use for mixing topics? → A: Contextual interleaving (mix related topics within sessions, respect cognitive load)
 
 ---
 
@@ -64,6 +75,7 @@ Implement the 6 core AI teaching roles (Teacher, Coach, Examiner, Marker, Review
 - Mark scheme application service
 - Criterion-by-criterion scoring
 - Error detection and categorization
+- Confidence scoring (<70% triggers manual review flag)
 
 #### 5. Reviewer Agent Implementation
 - `/api/feedback/analyze-weaknesses` endpoint
@@ -75,9 +87,9 @@ Implement the 6 core AI teaching roles (Teacher, Coach, Examiner, Marker, Review
 #### 6. Planner Agent Implementation
 - `/api/planning/create-schedule` endpoint
 - Study schedule generation service (n-day plans)
-- Spaced repetition algorithm
-- Interleaving strategy
-- Adaptive scheduling based on progress
+- **SuperMemo 2 (SM-2) spaced repetition algorithm** (production-quality)
+- **Contextual interleaving** (mix related topics, respect cognitive load)
+- Adaptive scheduling based on progress and easiness factors
 
 #### 7. Custom Skills Creation
 - `phd-pedagogy` skill (evidence-based teaching)
@@ -210,6 +222,7 @@ Database (PostgreSQL) + LLM Providers (Claude Sonnet 4.5)
 4. **MarkingService** (`src/services/marking_service.py`)
    - `mark_answer(question_id, student_answer, student_id) -> MarkingResult`
    - Economics 9708 marking engine with AO1/AO2/AO3
+   - Returns: marks, breakdown, errors, confidence_score (0-100), needs_review flag
 
 5. **ReviewService** (`src/services/review_service.py`)
    - `analyze_weaknesses(attempt_id, student_id) -> WeaknessReport`
@@ -217,7 +230,10 @@ Database (PostgreSQL) + LLM Providers (Claude Sonnet 4.5)
 
 6. **PlanningService** (`src/services/planning_service.py`)
    - `create_study_plan(subject_id, exam_date, hours_per_day, student_id) -> StudyPlan`
-   - Spaced repetition + interleaving algorithms
+   - **SuperMemo 2 (SM-2)** spaced repetition with easiness factors (EF)
+   - **Contextual interleaving**: Groups related topics (same syllabus section) within sessions
+   - Respects cognitive load (max 3 topics per day, related topics only)
+   - Adaptive rescheduling based on actual performance
 
 ### Database Schema Additions
 
@@ -228,10 +244,14 @@ CREATE TABLE coaching_sessions (
     student_id UUID REFERENCES students(id),
     topic VARCHAR(500) NOT NULL,
     struggle_description TEXT,
-    session_transcript JSONB,  -- Full conversation
+    session_transcript JSONB,  -- Array of {role, content, timestamp} objects
     outcome VARCHAR(50),  -- "resolved", "needs_more_help", "refer_to_teacher"
     created_at TIMESTAMP DEFAULT NOW()
 );
+-- Example session_transcript: [
+--   {"role": "student", "content": "I don't understand elasticity", "timestamp": "2025-01-15T10:00:00Z"},
+--   {"role": "coach", "content": "Let me help with a question...", "timestamp": "2025-01-15T10:00:02Z"}
+-- ]
 
 -- Study plans
 CREATE TABLE study_plans (
@@ -241,11 +261,17 @@ CREATE TABLE study_plans (
     exam_date DATE NOT NULL,
     total_days INT NOT NULL,
     hours_per_day FLOAT NOT NULL,
-    schedule JSONB NOT NULL,  -- Day-by-day plan
+    schedule JSONB NOT NULL,  -- Day-by-day plan with SM-2 intervals
+    easiness_factors JSONB,  -- SM-2 EF per syllabus point: {"9708.1.1": 2.5, "9708.2.1": 2.8}
     status VARCHAR(20) DEFAULT 'active',  -- "active", "completed", "abandoned"
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+-- Example schedule: [
+--   {"day": 1, "topics": ["9708.1.1"], "interval": 1, "activities": ["study", "practice"]},
+--   {"day": 4, "topics": ["9708.1.1"], "interval": 3, "activities": ["review"]},
+--   {"day": 11, "topics": ["9708.1.1", "9708.2.1"], "interval": 7, "activities": ["mixed_review"]}
+-- ]
 
 -- Improvement plans
 CREATE TABLE improvement_plans (
@@ -308,12 +334,12 @@ PATCH  /api/planning/schedule/{id}/progress   # Planner Agent
 21. Write tests for ReviewService
 
 ### Task Group 5: Planner Agent
-22. Create study_plans table migration
+22. Create study_plans table migration (add easiness_factors JSONB field)
 23. Create PlanningService class
-24. Implement spaced repetition algorithm
-25. Implement interleaving strategy
-26. Create planning endpoints
-27. Write tests for PlanningService
+24. Implement SuperMemo 2 (SM-2) algorithm (production-grade, with unit tests for EF calculations)
+25. Implement contextual interleaving strategy (group related topics by syllabus section, max 3 topics/day, cognitive load rules)
+26. Create planning endpoints (/create-schedule, /{id}, /{id}/progress)
+27. Write comprehensive tests for PlanningService (validate SM-2 intervals, interleaving patterns, adaptive rescheduling)
 
 ### Task Group 6: Examiner Enhancement
 28. Enhance ExamGenerationService with personalization
@@ -354,11 +380,14 @@ PATCH  /api/planning/schedule/{id}/progress   # Planner Agent
 ### Risk 1: Marking Accuracy Below 85% Target
 **Impact**: HIGH - Students get incorrect feedback
 **Probability**: MEDIUM
-**Mitigation**: 
+**Mitigation**:
 - Start with 10 sample Cambridge questions with official mark schemes
 - Manual validation of first 20 marked answers
 - Iterative prompt engineering to improve accuracy
 - If needed, use few-shot examples in prompts
+- **Confidence Scoring**: All marks include 0-100 confidence score
+- **Manual Review Queue**: Marks with <70% confidence flagged for expert review
+- Track confidence vs. accuracy correlation to refine threshold over time
 
 ### Risk 2: LLM Latency Too High for Real-Time Teaching
 **Impact**: MEDIUM - Poor user experience
@@ -367,7 +396,11 @@ PATCH  /api/planning/schedule/{id}/progress   # Planner Agent
 - Cache common topic explanations
 - Use streaming responses for long explanations
 - Set timeout limits (max 10s for Teacher, 5s for Coach)
-- Fall back to pre-generated explanations if LLM unavailable
+- **Double Fallback Strategy**:
+  1. Retry with exponential backoff (1s, 2s, 4s delays)
+  2. Fall back to cached/generic responses where possible
+  3. Prompt user to try alternative LLM (Gemini, GPT-4) if Claude unavailable
+- Log all failures for monitoring and alerting
 
 ### Risk 3: Scope Creep - Too Many Features
 **Impact**: HIGH - Phase III not completed on time
@@ -428,6 +461,7 @@ PATCH  /api/planning/schedule/{id}/progress   # Planner Agent
 ---
 
 **Created**: 2025-12-20
-**Phase**: III  
+**Phase**: III
 **Status**: Draft → Awaiting Approval
-**Estimated Effort**: 7-10 days (focused implementation)
+**Quality Bar**: Production v1.0 (not MVP demo - robust, tested, production-ready)
+**Estimated Effort**: 7-10 days (focused implementation with production-grade testing)

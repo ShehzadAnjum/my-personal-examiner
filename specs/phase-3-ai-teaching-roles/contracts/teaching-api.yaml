@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: Teaching Agent API
+  description: PhD-level concept explanations and topic teaching for Economics 9708
+  version: 1.0.0
+  contact:
+    name: My Personal Examiner
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development
+  - url: https://api.mypersonalexaminer.com/api
+    description: Production
+
+paths:
+  /teaching/explain-concept:
+    post:
+      summary: Explain a syllabus concept
+      description: |
+        Request PhD-level explanation of any Economics 9708 syllabus point.
+        Returns structured explanation with examples, diagrams (Mermaid/ASCII), and practice problems.
+      operationId: explainConcept
+      tags:
+        - Teaching
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - syllabus_point_id
+                - student_id
+              properties:
+                syllabus_point_id:
+                  type: string
+                  format: uuid
+                  description: UUID of the syllabus point to explain
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                student_id:
+                  type: string
+                  format: uuid
+                  description: UUID of the student requesting explanation
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                context:
+                  type: string
+                  description: Optional context about what the student already knows
+                  example: "I understand demand but not elasticity"
+            examples:
+              basic:
+                summary: Basic concept request
+                value:
+                  syllabus_point_id: "550e8400-e29b-41d4-a716-446655440000"
+                  student_id: "123e4567-e89b-12d3-a456-426614174000"
+              with_context:
+                summary: Request with student context
+                value:
+                  syllabus_point_id: "550e8400-e29b-41d4-a716-446655440000"
+                  student_id: "123e4567-e89b-12d3-a456-426614174000"
+                  context: "I understand basic supply and demand but struggle with shifts vs movements"
+
+      responses:
+        '200':
+          description: Successful explanation generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - explanation_id
+                  - syllabus_point_code
+                  - topic
+                  - explanation
+                  - examples
+                  - practice_problems
+                properties:
+                  explanation_id:
+                    type: string
+                    format: uuid
+                    description: Unique ID for this explanation
+                  syllabus_point_code:
+                    type: string
+                    description: Syllabus point code (e.g., "9708.1.1")
+                    example: "9708.1.1"
+                  topic:
+                    type: string
+                    description: Topic name
+                    example: "Scarcity and Choice"
+                  explanation:
+                    type: string
+                    description: Detailed PhD-level explanation
+                    example: "Scarcity is the fundamental economic problem arising from limited resources and unlimited wants..."
+                  key_concepts:
+                    type: array
+                    items:
+                      type: string
+                    description: List of key concepts covered
+                    example: ["Scarcity", "Opportunity Cost", "Resource Allocation"]
+                  examples:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        relevance:
+                          type: string
+                    description: Real-world examples
+                  diagrams:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: [mermaid, ascii]
+                        content:
+                          type: string
+                        caption:
+                          type: string
+                    description: Visual aids (Mermaid syntax or ASCII art)
+                  practice_problems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                        difficulty:
+                          type: string
+                          enum: [easy, medium, hard]
+                        hints:
+                          type: array
+                          items:
+                            type: string
+                    description: Practice questions for the topic
+                  related_topics:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                    description: UUIDs of related syllabus points
+                  estimated_study_time:
+                    type: integer
+                    description: Recommended study time in minutes
+                    example: 45
+              example:
+                explanation_id: "789e0123-e89b-12d3-a456-426614174999"
+                syllabus_point_code: "9708.1.1"
+                topic: "Scarcity and Choice"
+                explanation: "Scarcity is the fundamental economic problem..."
+                key_concepts: ["Scarcity", "Opportunity Cost"]
+                examples:
+                  - title: "Time Scarcity"
+                    description: "Students choosing between studying Economics or Mathematics"
+                    relevance: "Demonstrates opportunity cost in everyday decisions"
+                diagrams:
+                  - type: "mermaid"
+                    content: "graph TD\nA[Limited Resources] --> B[Scarcity]\nB --> C[Choice]\nC --> D[Opportunity Cost]"
+                    caption: "The Economic Problem Flow"
+                practice_problems:
+                  - question: "Explain how scarcity leads to choice"
+                    difficulty: "medium"
+                    hints: ["Think about limited resources", "Consider unlimited wants"]
+                related_topics: ["550e8400-e29b-41d4-a716-446655440001"]
+                estimated_study_time: 45
+
+        '404':
+          description: Syllabus point not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Syllabus point with ID 550e8400-e29b-41d4-a716-446655440000 not found"
+                error_code: "SYLLABUS_POINT_NOT_FOUND"
+
+        '500':
+          description: LLM service unavailable (all fallbacks exhausted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "Claude Sonnet unavailable after retries. Please try again or use alternative LLM (Gemini/GPT-4)."
+                error_code: "LLM_SERVICE_UNAVAILABLE"
+                fallback_attempted: true
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+        error_code:
+          type: string
+          description: Machine-readable error code
+        fallback_attempted:
+          type: boolean
+          description: Whether fallback strategies were tried

@@ -1,7 +1,7 @@
 """Add mark_schemes table and update questions table for Phase II US1
 
 Revision ID: 70253d04973d
-Revises: 002_questions
+Revises: 002b_attempts
 Create Date: 2025-12-19
 
 Phase II User Story 1: Upload & Storage
@@ -22,7 +22,7 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY, JSONB
 
 # revision identifiers, used by Alembic.
 revision: str = '70253d04973d'
-down_revision: Union[str, Sequence[str], None] = '002_questions'
+down_revision: Union[str, Sequence[str], None] = '002b_attempts'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
