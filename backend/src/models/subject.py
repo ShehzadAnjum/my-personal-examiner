@@ -10,9 +10,11 @@ Constitutional Requirements:
 - Syllabus synchronization required monthly - Principle III
 """
 
+from typing import Any
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, SQLModel
+from sqlalchemy import JSON
+from sqlmodel import Column, Field, SQLModel
 
 
 class Subject(SQLModel, table=True):
@@ -46,6 +48,7 @@ class Subject(SQLModel, table=True):
     """
 
     __tablename__ = "subjects"
+    __table_args__ = {"extend_existing": True}
 
     # Primary Key
     id: UUID = Field(
@@ -85,6 +88,25 @@ class Subject(SQLModel, table=True):
         nullable=False,
         max_length=20,
         description="Syllabus version years (e.g., '2023-2025')",
+    )
+
+    # Phase II: Subject Configuration (JSON - compatible with SQLite for testing, uses JSONB in PostgreSQL) - AD-001
+    marking_config: dict[str, Any] | None = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Marking rubric config (level descriptors, rubric type, essay structure)",
+    )
+
+    extraction_patterns: dict[str, Any] | None = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="PDF extraction patterns (question delimiters, marks patterns, subparts)",
+    )
+
+    paper_templates: dict[str, Any] | None = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Paper structure templates (paper types, question counts, marks distribution)",
     )
 
     # Validation methods

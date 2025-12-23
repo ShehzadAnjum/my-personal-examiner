@@ -1,144 +1,163 @@
-# Skill: PhD Pedagogy (Constructive Feedback)
+# Skill: PhD-Level Pedagogy
 
-**Type**: Teaching Methodology
-**Created**: 2025-12-18
-**Domain**: Educational Feedback
-**Parent Agent**: 06-AI-Pedagogy
+**Domain**: Educational Psychology & Evidence-Based Teaching
+**Purpose**: Implement research-backed teaching strategies for A-Level students
+**Created**: 2025-12-21
+**Phase**: III (AI Teaching Roles)
+
+---
 
 ## Overview
-PhD-level teaching feedback that explains WHY and HOW, using Socratic method and deep explanation.
 
-## Constitutional Requirement
-**Principle VI**: Feedback is Constructive and Detailed - Always explain WHY wrong and HOW to improve.
+This skill provides evidence-based pedagogical strategies for PhD-level teaching quality in the My Personal Examiner system. All teaching, tutoring, and feedback must align with cognitive science research and proven learning methodologies.
 
-## Feedback Structure (MANDATORY)
+---
 
-### 1. Score Context
+## Core Principles
+
+### 1. Socratic Method for Deep Learning
+
+**What**: Question-based teaching that guides students to discover concepts themselves.
+
+**How to Implement**:
+- Start with student's current understanding
+- Ask probing questions rather than giving direct answers
+- Guide through logical steps toward correct understanding
+- Validate reasoning process, not just final answer
+
+**Example**:
+```
+❌ Wrong: "Supply increases when price rises because suppliers want more profit."
+✅ Right: "What happens to a supplier's revenue when price increases? What about their opportunity cost? How might this affect their willingness to supply?"
+```
+
+**Research**: Vygotsky's Zone of Proximal Development, Bloom's Taxonomy Level 6 (Evaluate)
+
+---
+
+### 2. Constructive Feedback Structure
+
+**What**: Feedback that explains WHY something is wrong and HOW to improve.
+
+**Template** (Mandatory for all feedback):
 ```markdown
-## Score: [marks_awarded] / [max_marks] (Grade: [grade])
+## Score: {marks} / {max_marks}
+
+### What You Did Well
+{Specific strengths with examples}
+
+### Why Marks Were Deducted
+{Explain reasoning, not just "wrong"}
+
+### How to Reach A* Standard
+{Actionable steps with model answer}
+
+### Practice Recommendation
+{Specific exercises to address weaknesses}
 ```
 
-### 2. Why This Score (Explain Reasoning)
-```markdown
-### Why This Score:
-**What was good:**
-- You correctly identified [X]
-- Your diagram showed [Y]
-- You applied the concept of [Z] effectively
+**Research**: Hattie & Timperley (2007) - Feedback levels (task, process, self-regulation, self)
 
-**What was missing/incorrect:**
-- The analysis lacked [depth/chain of reasoning/consideration of...]
-- The evaluation was one-sided (only benefits, not costs)
-- The example was generic rather than specific
+---
+
+### 3. Spaced Repetition (SuperMemo 2)
+
+**What**: Review topics at increasing intervals based on performance.
+
+**Algorithm**:
+- Interval 1: 1 day
+- Interval 2: 6 days
+- Interval n: I(n-1) × EF (easiness factor)
+- EF updates based on performance: EF' = EF + (0.1 - (5-q) × (0.08 + (5-q) × 0.02))
+
+**Why**: 30% better long-term retention vs. massed practice (Cepeda et al., 2006)
+
+**Implementation**: PlanningService.create_study_plan()
+
+---
+
+### 4. Contextual Interleaving
+
+**What**: Mix related topics within study sessions (not random interleaving).
+
+**Rules**:
+- Max 3 related topics per session (cognitive load theory)
+- Group by syllabus section (e.g., "9708.1.x" together)
+- Practice pattern: A → B → A → C → B (not A → A → A → B → B)
+
+**Why**: 43% better discrimination between concepts (Rohrer & Taylor, 2007)
+
+**Implementation**: ContextualInterleaving.create_daily_clusters()
+
+---
+
+### 5. Cognitive Load Management
+
+**What**: Don't overload working memory (Miller's 7±2 items).
+
+**Strategies**:
+- Break complex diagrams into steps
+- Teach prerequisites before advanced topics
+- Use analogies from familiar domains
+- Provide scaffolding for essay structure
+
+**Example** (Teaching supply/demand equilibrium):
+1. First: Draw supply curve alone
+2. Second: Draw demand curve alone
+3. Third: Overlay and identify intersection
+4. Fourth: Explain meaning of equilibrium
+5. Fifth: Practice with shifts
+
+**Research**: Sweller's Cognitive Load Theory (1988)
+
+---
+
+### 6. Metacognitive Skill Development
+
+**What**: Teach students HOW to learn, not just WHAT to learn.
+
+**Techniques**:
+- Ask "How did you approach this question?"
+- Encourage self-explanation ("Explain in your own words...")
+- Promote error analysis ("What would you do differently?")
+- Teach exam technique explicitly
+
+**Example** (Coaching session):
+```
+Student: "I don't understand elasticity."
+Coach: "What have you tried so far to understand it? What specifically is confusing? Can you explain the parts you DO understand?"
 ```
 
-### 3. How to Improve to A* (Actionable Steps)
-```markdown
-### How to Reach A* Standard:
-1. **Deepen your analysis**: Instead of "price increases," explain WHY (demand exceeds supply, creating upward pressure until new equilibrium)
+**Research**: Flavell's Metacognition Framework (1979)
 
-2. **Add diagrams**: Include a supply/demand diagram with:
-   - Labeled axes (P and Q)
-   - S and D curves clearly marked
-   - E and E1 equilibrium points
-   - Arrows showing shifts
+---
 
-3. **Balance your evaluation**: Consider BOTH:
-   - Arguments FOR: [benefit 1], [benefit 2], [benefit 3]
-   - Arguments AGAINST: [cost 1], [cost 2], [cost 3]
+### 7. A* Standard Rigor
 
-4. **Make specific examples**: Instead of "in many countries," use "In the UK during 2020, inflation rose to 2.5% due to..."
+**What**: Never compromise on quality—mark exactly as Cambridge examiners would.
 
-5. **Add "it depends on"**: Consider elasticity, time period, government priorities
-```
+**A* Characteristics** (Economics 9708):
+- **Knowledge (AO1)**: Accurate definitions, comprehensive coverage
+- **Application (AO2)**: Real-world examples, diagram accuracy, calculation correctness
+- **Evaluation (AO3)**: Balanced arguments, justified conclusions, perceptive analysis
 
-### 4. Model Answer (A* Standard)
-```markdown
-### Model Answer Demonstrating A* Quality:
+**Grading Mindset**:
+- Deduct marks for incomplete reasoning (even if answer is correct)
+- Demand sophistication in evaluation (not just "advantages and disadvantages")
+- Require economic terminology precision
 
-[Rewrite the student's answer to show what A* looks like]
+**Research**: Cambridge International Examiner Reports (published annually)
 
-**Notice how this answer:**
-- Uses precise terminology
-- Includes a labeled diagram
-- Develops chains of reasoning (X → Y → Z)
-- Considers both sides before judgment
-- Uses specific examples with data
-```
+---
 
-### 5. Specific Weaknesses with Remediation
-```markdown
-### Weaknesses Identified:
-- **insufficient_evaluation**: You only considered benefits. Add 2-3 counterarguments.
-- **lacks_diagram**: Include a diagram to visualize shifts in supply/demand.
-- **weak_conclusion**: State your judgment clearly ("On balance, I argue that...because...")
-```
+## Research Citations
 
-## Tone Guidelines
+- Cepeda, N. J., et al. (2006). "Distributed practice in verbal recall tasks." *Psychological Bulletin*, 132(3), 354-380.
+- Ebbinghaus, H. (1885). *Memory: A Contribution to Experimental Psychology.*
+- Rohrer, D., & Taylor, K. (2007). "The shuffling of mathematics problems improves learning." *Instructional Science*, 35(6), 481-498.
+- Sweller, J. (1988). "Cognitive load during problem solving." *Cognitive Science*, 12(2), 257-285.
+- Miller, G. A. (1956). "The magical number seven, plus or minus two." *Psychological Review*, 63(2), 81-97.
+- Hattie, J., & Timperley, H. (2007). "The power of feedback." *Review of Educational Research*, 77(1), 81-112.
+- Flavell, J. H. (1979). "Metacognition and cognitive monitoring." *American Psychologist*, 34(10), 906-911.
 
-### ✅ DO: Encouraging but Rigorous
-```
-"Your analysis of elasticity was sound, showing clear understanding. To reach A*, develop this further by..."
-```
-
-### ❌ DON'T: Generic or Harsh
-```
-"Wrong. Try harder."  // Too harsh, not constructive
-"Good job!"           // Too vague, not helpful
-```
-
-### ✅ DO: Specific and Actionable
-```
-"Your diagram was missing labeled equilibrium points (E and E1). Add these to show the shift from old to new equilibrium."
-```
-
-### ❌ DON'T: Vague
-```
-"Your diagram needs improvement."  // What exactly?
-```
-
-## Socratic Method (Question-Based Learning)
-
-Instead of telling the answer, guide with questions:
-```markdown
-### Reflection Questions to Deepen Understanding:
-1. Why might demand elasticity affect the outcome?
-2. What happens to producer surplus when price rises?
-3. How might the government's policy differ in the short-run vs. long-run?
-4. Which stakeholders benefit and which lose from this policy?
-```
-
-## Personalized Improvement Plan
-
-```markdown
-### Your Personalized Focus Areas:
-Based on your last 5 attempts, work on:
-1. **Evaluation skills** (weakest area - 60% vs 90% needed)
-   - Practice: Write 3 evaluation paragraphs daily
-   - Template: "On one hand... On the other hand... On balance..."
-
-2. **Diagram accuracy** (70% vs 90% needed)
-   - Practice: Draw 5 diagrams daily with full labels
-   - Check: Are all curves labeled? Are equilibrium points marked?
-
-3. **Specific examples** (already strong - maintain)
-   - Keep using: Real countries, dates, data
-```
-
-## Constitutional Compliance
-
-**Principle VI**: Feedback is Constructive and Detailed
-- ✅ Explains WHY something is wrong
-- ✅ Shows HOW to improve
-- ✅ Provides model answer
-- ✅ Identifies specific weaknesses
-- ✅ Creates actionable improvement plan
-
-**Principle II**: A* Standard Always
-- ✅ Feedback is itself PhD-level quality
-- ✅ No "just try harder" generic advice
-- ✅ Deep explanation, Socratic questioning
-
-**Usage:** 0 times (Phase III not started)
-**Will Use:** Every feedback generation (50+ times)
-**Version**: 1.0.0 | **Last Updated**: 2025-12-18
+**Version**: 1.0.0 | **Created**: 2025-12-21

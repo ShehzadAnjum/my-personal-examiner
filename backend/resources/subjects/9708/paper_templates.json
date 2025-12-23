@@ -1,0 +1,348 @@
+{
+  "version": "1.0",
+  "subject_code": "9708",
+  "subject_name": "Economics",
+  "syllabus_year": "2023-2025",
+  "papers": [
+    {
+      "paper_number": 1,
+      "paper_name": "Multiple Choice",
+      "type": "MCQ",
+      "level": "AS",
+      "duration": 60,
+      "total_marks": 30,
+      "questions_count": 30,
+      "marks_per_question": 1,
+      "question_selection": "all_compulsory",
+      "difficulty_distribution": {
+        "easy": 0.4,
+        "medium": 0.4,
+        "hard": 0.2
+      },
+      "syllabus_coverage": {
+        "basic_economic_ideas": 0.35,
+        "price_system": 0.35,
+        "government_microeconomic_intervention": 0.30
+      },
+      "notes": "Paper 1 deferred to later phase - requires OCR for diagram-based MCQs",
+      "status": "not_implemented_phase_2"
+    },
+    {
+      "paper_number": 2,
+      "paper_name": "Data Response",
+      "type": "DATA_RESPONSE",
+      "level": "AS",
+      "duration": 90,
+      "total_marks": 40,
+      "questions_count": 3,
+      "marks_distribution": [
+        {"question": 1, "marks": 8},
+        {"question": 2, "marks": 12},
+        {"question": 3, "marks": 20}
+      ],
+      "question_selection": "all_compulsory",
+      "typical_structure": {
+        "context_passages": 1,
+        "data_sources": "tables, graphs, or text extracts",
+        "question_types": [
+          "data_interpretation",
+          "short_analysis",
+          "extended_analysis_with_evaluation"
+        ]
+      },
+      "difficulty_distribution": {
+        "easy": 0.20,
+        "medium": 0.50,
+        "hard": 0.30
+      },
+      "syllabus_coverage": {
+        "basic_economic_ideas": 0.25,
+        "price_system": 0.35,
+        "government_microeconomic_intervention": 0.25,
+        "international_economic_issues": 0.15
+      },
+      "marking_approach": "combination_of_points_and_levels",
+      "notes": "Paper 2 implemented in Phase II - data response with mixed marks allocation"
+    },
+    {
+      "paper_number": 3,
+      "paper_name": "Multiple Choice (Advanced)",
+      "type": "MCQ",
+      "level": "A",
+      "duration": 105,
+      "total_marks": 30,
+      "questions_count": 30,
+      "marks_per_question": 1,
+      "question_selection": "all_compulsory",
+      "difficulty_distribution": {
+        "easy": 0.25,
+        "medium": 0.45,
+        "hard": 0.30
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "notes": "Paper 3 (MCQ) deferred - confused with Paper 3 essays in older syllabi",
+      "status": "not_implemented_phase_2"
+    },
+    {
+      "paper_number": 31,
+      "paper_name": "Essays (Variant 1)",
+      "type": "ESSAYS",
+      "level": "A",
+      "duration": 105,
+      "total_marks": 75,
+      "questions_available": 8,
+      "questions_to_answer": 3,
+      "marks_per_question": 25,
+      "question_selection": "student_choice",
+      "typical_structure": {
+        "questions_format": "extended_essay",
+        "typical_keywords": [
+          "Discuss",
+          "Evaluate",
+          "To what extent",
+          "Assess",
+          "Consider"
+        ],
+        "expected_content": [
+          "Clear understanding of economic concepts",
+          "Application of theory",
+          "Use of diagrams",
+          "Evaluation with supported judgment"
+        ]
+      },
+      "difficulty_distribution": {
+        "easy": 0.125,
+        "medium": 0.50,
+        "hard": 0.375
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "marking_approach": "level_descriptors_L1_to_L4",
+      "notes": "Paper 31 (essays) is PRIMARY focus for Phase II extraction testing"
+    },
+    {
+      "paper_number": 32,
+      "paper_name": "Essays (Variant 2)",
+      "type": "ESSAYS",
+      "level": "A",
+      "duration": 105,
+      "total_marks": 75,
+      "questions_available": 8,
+      "questions_to_answer": 3,
+      "marks_per_question": 25,
+      "question_selection": "student_choice",
+      "typical_structure": {
+        "questions_format": "extended_essay",
+        "typical_keywords": [
+          "Discuss",
+          "Evaluate",
+          "To what extent",
+          "Assess",
+          "Consider"
+        ],
+        "expected_content": [
+          "Clear understanding of economic concepts",
+          "Application of theory",
+          "Use of diagrams",
+          "Evaluation with supported judgment"
+        ]
+      },
+      "difficulty_distribution": {
+        "easy": 0.125,
+        "medium": 0.50,
+        "hard": 0.375
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "marking_approach": "level_descriptors_L1_to_L4",
+      "notes": "Variant 2 - identical structure to Variant 1, different question content"
+    },
+    {
+      "paper_number": 33,
+      "paper_name": "Essays (Variant 3)",
+      "type": "ESSAYS",
+      "level": "A",
+      "duration": 105,
+      "total_marks": 75,
+      "questions_available": 8,
+      "questions_to_answer": 3,
+      "marks_per_question": 25,
+      "question_selection": "student_choice",
+      "typical_structure": {
+        "questions_format": "extended_essay",
+        "typical_keywords": [
+          "Discuss",
+          "Evaluate",
+          "To what extent",
+          "Assess",
+          "Consider"
+        ],
+        "expected_content": [
+          "Clear understanding of economic concepts",
+          "Application of theory",
+          "Use of diagrams",
+          "Evaluation with supported judgment"
+        ]
+      },
+      "difficulty_distribution": {
+        "easy": 0.125,
+        "medium": 0.50,
+        "hard": 0.375
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "marking_approach": "level_descriptors_L1_to_L4",
+      "notes": "Variant 3 - identical structure to Variants 1 and 2, different question content"
+    },
+    {
+      "paper_number": 41,
+      "paper_name": "Data Response and Essays (Variant 1)",
+      "type": "HYBRID",
+      "level": "A",
+      "duration": 135,
+      "total_marks": 70,
+      "sections": [
+        {
+          "section": "A",
+          "type": "DATA_RESPONSE",
+          "questions_count": 1,
+          "marks": 30,
+          "compulsory": true
+        },
+        {
+          "section": "B",
+          "type": "ESSAYS",
+          "questions_available": 4,
+          "questions_to_answer": 2,
+          "marks_per_question": 20,
+          "compulsory": false
+        }
+      ],
+      "difficulty_distribution": {
+        "easy": 0.15,
+        "medium": 0.50,
+        "hard": 0.35
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "notes": "Paper 4 combines data response with essays - comprehensive assessment"
+    },
+    {
+      "paper_number": 42,
+      "paper_name": "Data Response and Essays (Variant 2)",
+      "type": "HYBRID",
+      "level": "A",
+      "duration": 135,
+      "total_marks": 70,
+      "sections": [
+        {
+          "section": "A",
+          "type": "DATA_RESPONSE",
+          "questions_count": 1,
+          "marks": 30,
+          "compulsory": true
+        },
+        {
+          "section": "B",
+          "type": "ESSAYS",
+          "questions_available": 4,
+          "questions_to_answer": 2,
+          "marks_per_question": 20,
+          "compulsory": false
+        }
+      ],
+      "difficulty_distribution": {
+        "easy": 0.15,
+        "medium": 0.50,
+        "hard": 0.35
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "notes": "Variant 2 - identical structure to Variant 1"
+    },
+    {
+      "paper_number": 43,
+      "paper_name": "Data Response and Essays (Variant 3)",
+      "type": "HYBRID",
+      "level": "A",
+      "duration": 135,
+      "total_marks": 70,
+      "sections": [
+        {
+          "section": "A",
+          "type": "DATA_RESPONSE",
+          "questions_count": 1,
+          "marks": 30,
+          "compulsory": true
+        },
+        {
+          "section": "B",
+          "type": "ESSAYS",
+          "questions_available": 4,
+          "questions_to_answer": 2,
+          "marks_per_question": 20,
+          "compulsory": false
+        }
+      ],
+      "difficulty_distribution": {
+        "easy": 0.15,
+        "medium": 0.50,
+        "hard": 0.35
+      },
+      "syllabus_coverage": {
+        "macroeconomic_concepts": 0.50,
+        "government_macroeconomic_intervention": 0.50
+      },
+      "notes": "Variant 3 - identical structure to Variants 1 and 2"
+    }
+  ],
+  "exam_generation_rules": {
+    "practice_exam": {
+      "description": "Custom practice exam with flexible criteria",
+      "allow_mixed_papers": true,
+      "allow_partial_papers": true,
+      "min_questions": 1,
+      "max_questions": 10,
+      "respect_difficulty_distribution": true,
+      "exclude_student_attempted": true
+    },
+    "timed_exam": {
+      "description": "Timed exam matching paper structure",
+      "allow_mixed_papers": false,
+      "must_match_paper_template": true,
+      "exact_marks_required": true,
+      "exact_duration_required": true,
+      "exclude_student_attempted": true
+    },
+    "full_paper": {
+      "description": "Exact replication of Cambridge paper",
+      "require_paper_number": true,
+      "exact_paper_structure": true,
+      "original_question_order": true,
+      "exclude_student_attempted": false
+    }
+  },
+  "difficulty_calculation": {
+    "method": "marks_based_heuristic",
+    "rules": {
+      "easy": "1-12 marks",
+      "medium": "13-20 marks",
+      "hard": "21-30 marks"
+    },
+    "upgrade_phase_3": "Use historical performance data (average_score / max_marks ratio)"
+  },
+  "notes": "Economics 9708 has multiple paper structures depending on AS/A-Level and variant. Phase II focuses on Papers 2 (Data Response) and Papers 31/32/33 (Essays) for extraction testing. Paper 1 and 3 (MCQs) deferred due to diagram OCR complexity. Paper 4 (hybrid) structure documented for future implementation."
+}

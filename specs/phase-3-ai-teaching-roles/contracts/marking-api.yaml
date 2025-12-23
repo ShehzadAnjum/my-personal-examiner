@@ -1,0 +1,237 @@
+openapi: 3.0.3
+info:
+  title: Marker Agent API
+  description: Strict Cambridge-compliant marking with confidence scoring
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+
+paths:
+  /marking/mark-answer:
+    post:
+      summary: Mark a single answer
+      description: |
+        Mark student answer using Cambridge Economics 9708 mark schemes.
+        Returns AO1/AO2/AO3 breakdown, confidence score, and manual review flag.
+      operationId: markAnswer
+      tags:
+        - Marking
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question_id
+                - student_answer
+                - student_id
+              properties:
+                question_id:
+                  type: string
+                  format: uuid
+                student_answer:
+                  type: string
+                  description: Student's written answer
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: Answer marked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarkingResult'
+              example:
+                marks_awarded: 8
+                max_marks: 12
+                percentage: 67
+                ao1_score: 3
+                ao1_max: 4
+                ao2_score: 3
+                ao2_max: 4
+                ao3_score: 2
+                ao3_max: 4
+                level: "L2"
+                errors:
+                  - category: "AO1 - Imprecise Definition"
+                    description: "Defined demand as 'what people want' instead of 'quantity willing and able to purchase at given price'"
+                    marks_lost: 1
+                  - category: "AO3 - No Evaluation"
+                    description: "Listed arguments but no weighing of significance or conclusion"
+                    marks_lost: 2
+                points_awarded:
+                  - point_id: "AO1-1"
+                    present: true
+                    quality: "good"
+                    quote: "Demand decreases when price increases"
+                  - point_id: "AO1-2"
+                    present: false
+                    quality: "missing"
+                confidence_score: 75
+                needs_review: false
+                feedback: "Good understanding of basic demand concept, but definition lacks precision. Include ceteris paribus assumption. Evaluation section needs strengthening with balanced arguments and clear conclusion."
+
+        '404':
+          description: Question not found
+        '500':
+          description: Marking service error
+
+  /marking/mark-attempt:
+    post:
+      summary: Mark entire exam attempt
+      description: Mark all questions in an exam attempt, generate overall statistics
+      operationId: markAttempt
+      tags:
+        - Marking
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attempt_id
+                - student_id
+              properties:
+                attempt_id:
+                  type: string
+                  format: uuid
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: Exam attempt marked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt_id:
+                    type: string
+                    format: uuid
+                  total_marks_awarded:
+                    type: integer
+                  total_max_marks:
+                    type: integer
+                  percentage:
+                    type: number
+                  grade:
+                    type: string
+                    enum: [A*, A, B, C, D, E, U]
+                  question_results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarkingResult'
+                  overall_ao_scores:
+                    type: object
+                    properties:
+                      AO1:
+                        type: object
+                        properties:
+                          awarded:
+                            type: integer
+                          max:
+                            type: integer
+                          percentage:
+                            type: number
+                      AO2:
+                        type: object
+                      AO3:
+                        type: object
+                  needs_review_count:
+                    type: integer
+                    description: Number of answers flagged for manual review
+                  average_confidence:
+                    type: number
+                    description: Average confidence score across all questions
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    MarkingResult:
+      type: object
+      required:
+        - marks_awarded
+        - max_marks
+        - confidence_score
+        - needs_review
+      properties:
+        marks_awarded:
+          type: integer
+          description: Marks awarded to student
+        max_marks:
+          type: integer
+          description: Maximum possible marks
+        percentage:
+          type: number
+          format: float
+          description: Percentage score
+        ao1_score:
+          type: integer
+          description: AO1 (Knowledge) marks
+        ao1_max:
+          type: integer
+        ao2_score:
+          type: integer
+          description: AO2 (Application) marks
+        ao2_max:
+          type: integer
+        ao3_score:
+          type: integer
+          description: AO3 (Evaluation) marks
+        ao3_max:
+          type: integer
+        level:
+          type: string
+          enum: [L1, L2, L3, L4]
+          description: Cambridge marking level
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              description:
+                type: string
+              marks_lost:
+                type: integer
+        points_awarded:
+          type: array
+          items:
+            type: object
+            properties:
+              point_id:
+                type: string
+              present:
+                type: boolean
+              quality:
+                type: string
+                enum: [excellent, good, weak, missing]
+              quote:
+                type: string
+        confidence_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Confidence in this marking result (0-100)
+        needs_review:
+          type: boolean
+          description: True if confidence < 70% (requires manual review)
+        feedback:
+          type: string
+          description: Detailed feedback explaining marks

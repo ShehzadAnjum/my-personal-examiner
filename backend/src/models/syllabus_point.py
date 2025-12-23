@@ -100,7 +100,12 @@ class SyllabusPoint(SQLModel, table=True):
             bool: True if code matches expected format
         """
         parts = self.code.split(".")
-        return len(parts) >= 2 and all(part.isdigit() or part.isalpha() for part in parts)
+        # Check: at least 2 parts, all parts non-empty, all parts alphanumeric
+        return (
+            len(parts) >= 2
+            and all(len(part) > 0 for part in parts)
+            and all(part.isdigit() or part.isalpha() for part in parts)
+        )
 
     def __repr__(self) -> str:
         """String representation for debugging"""

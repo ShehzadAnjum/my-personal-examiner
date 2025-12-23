@@ -1,0 +1,405 @@
+# Phase IV: Web UI - Frontend Patterns & Conventions
+
+**Purpose**: Next.js 16+ web application for My Personal Examiner
+**Status**: ✅ Coaching Page Complete (004-coaching-page)
+**Last Updated**: 2025-12-22
+
+---
+
+## 🎯 Quick Reference
+
+**Tech Stack**:
+- **Framework**: Next.js 16+ (App Router), React 19
+- **Styling**: Tailwind CSS 4, shadcn/ui patterns
+- **State**: TanStack Query 5.62+ (server state), React hooks (local state)
+- **UI Components**: ChatScope UI Kit, Custom components
+- **Types**: TypeScript 5.7+
+- **Testing**: Playwright 1.49+ (E2E), Jest 29+ (unit)
+
+**Key Principles**:
+1. Component composition over inheritance
+2. Server components by default, client components only when needed
+3. Accessibility-first (WCAG 2.1 AA compliance)
+4. Performance optimization for 50+ items (virtual scrolling, lazy loading)
+5. Error boundaries at page and component levels
+6. Toast notifications for user feedback
+7. Skeleton loading states for async operations
+8. Analytics tracking for all user actions
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/
+├── app/                          # Next.js App Router
+│   ├── (dashboard)/             # Authenticated routes
+│   │   ├── coaching/            # Coaching feature
+│   │   │   ├── page.tsx         # Main coaching page
+│   │   │   ├── history/         # Session history
+│   │   │   │   └── page.tsx
+│   │   │   ├── [sessionId]/     # Dynamic session detail
+│   │   │   │   └── page.tsx
+│   │   │   └── error.tsx        # Route-level error boundary
+│   │   └── teach/               # Teaching feature
+│   ├── layout.tsx               # Root layout
+│   ├── providers.tsx            # Client providers (TanStack Query, Toast)
+│   ├── globals.css              # Global styles
+│   └── error.tsx                # Global error boundary
+├── components/
+│   ├── coaching/                # Coaching-specific components
+│   │   ├── ChatInterface.tsx
+│   │   ├── SessionInitForm.tsx
+│   │   ├── SessionHistory.tsx
+│   │   ├── SessionOutcome.tsx
+│   │   ├── ErrorBoundary.tsx    # Reusable error boundary
+│   │   └── *Skeleton.tsx        # Loading skeletons
+│   └── ui/                      # Reusable UI components
+│       ├── skeleton.tsx
+│       └── toast.tsx
+├── lib/
+│   ├── api/                     # API client functions
+│   │   └── coaching.ts
+│   ├── validation/              # Input validation
+│   │   └── coaching.ts
+│   ├── analytics.ts             # Analytics tracking
+│   └── utils.ts                 # Utility functions
+├── hooks/
+│   ├── useToast.tsx             # Toast notifications
+│   ├── useKeyboardShortcuts.tsx # Global keyboard shortcuts
+│   └── useOnlineStatus.ts       # Network status
+├── types/
+│   └── coaching.ts              # TypeScript types
+└── tests/
+    └── e2e/
+        └── coaching/            # E2E tests per feature
+```
+
+---
+
+## 🏗️ Component Patterns
+
+### 1. Client vs Server Components
+
+**Default to Server Components** (no 'use client'):
+- Page layouts
+- Static content
+- Data fetching shells
+
+**Use Client Components** ('use client') when:
+- Need React hooks (useState, useEffect, etc.)
+- Event handlers (onClick, onChange, etc.)
+- Browser APIs (localStorage, window, etc.)
+- Third-party client libraries (ChatScope, TanStack Query)
+
+**Example**:
+```tsx
+// Server Component (default)
+export default function CoachingLayout({ children }) {
+  return <div>{children}</div>;
+}
+
+// Client Component
+'use client';
+export function ChatInterface() {
+  const [message, setMessage] = useState('');
+  return <input value={message} onChange={(e) => setMessage(e.target.value)} />;
+}
+```
+
+### 2. Error Boundaries
+
+**3 levels of error handling**:
+
+1. **Global** (`app/error.tsx`): Catches all unhandled errors
+2. **Route-level** (`app/(dashboard)/coaching/error.tsx`): Feature-specific errors
+3. **Component-level** (`ErrorBoundary.tsx`): Wrap individual components
+
+```tsx
+// Route-level error boundary
+export default function CoachingError({ error, reset }) {
+  return (
+    <div>
+      <h1>Coaching Error</h1>
+      <button onClick={reset}>Try Again</button>
+    </div>
+  );
+}
+
+// Component-level usage
+<ErrorBoundary componentName="ChatInterface">
+  <ChatInterface sessionId={id} />
+</ErrorBoundary>
+```
+
+### 3. Loading States
+
+**Use skeleton components** instead of spinners:
+- Better perceived performance
+- Matches actual UI structure
+- Accessible (aria-busy, aria-live)
+
+```tsx
+if (isLoading) {
+  return <ChatInterfaceSkeleton />;
+}
+```
+
+### 4. Toast Notifications
+
+**Use for**:
+- Success confirmations ("Session started successfully")
+- Error messages ("Failed to send message")
+- Warnings ("Connection lost")
+- Info messages ("Feature not available yet")
+
+```tsx
+const { toast } = useToast();
+
+toast({
+  title: 'Success',
+  description: 'Session created!',
+  variant: 'success',
+  duration: 3000,
+});
+```
+
+---
+
+## 🎨 Styling Conventions
+
+### Tailwind CSS Patterns
+
+**Layout**:
+```tsx
+<div className="max-w-4xl mx-auto p-6">          {/* Container */}
+<div className="flex items-center gap-4">        {/* Flexbox */}
+<div className="grid grid-cols-3 gap-4">         {/* Grid */}
+```
+
+**Typography**:
+```tsx
+<h1 className="text-3xl font-bold text-gray-900"> {/* Heading */}
+<p className="text-sm text-gray-600">             {/* Body text */}
+```
+
+**Interactive Elements**:
+```tsx
+<button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+  {/* Button */}
+</button>
+```
+
+**Responsive Design**:
+```tsx
+<div className="hidden md:block">  {/* Desktop only */}
+<div className="md:hidden">        {/* Mobile only */}
+<div className="text-sm md:text-base"> {/* Responsive sizing */}
+```
+
+---
+
+## 🔌 API Integration
+
+### TanStack Query Patterns
+
+**Queries** (GET requests):
+```tsx
+export function useSession(sessionId: string) {
+  return useQuery({
+    queryKey: ['coaching-session', sessionId],
+    queryFn: () => fetchSession(sessionId),
+    refetchInterval: (data) => data?.outcome === 'in_progress' ? 3000 : false,
+    networkMode: 'offlineFirst',
+    retry: 2,
+  });
+}
+```
+
+**Mutations** (POST/PUT/DELETE):
+```tsx
+export function useSendMessage(sessionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { student_response: string }) =>
+      sendMessage(sessionId, data),
+    onSuccess: () => {
+      // Invalidate to refetch
+      queryClient.invalidateQueries({ queryKey: ['coaching-session', sessionId] });
+    },
+  });
+}
+```
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+**Implemented shortcuts**:
+- `Ctrl+Enter` / `Cmd+Enter`: Send message (ChatInterface)
+- `Escape`: Close modals/menus (SessionHistory filter)
+
+**Adding new shortcuts**:
+```tsx
+useKeyboardShortcuts({
+  'Ctrl+S': () => saveDraft(),
+  'Escape': () => closeModal(),
+});
+```
+
+---
+
+## 📊 Analytics Tracking
+
+**Track these events**:
+- Page views
+- User actions (button clicks, form submissions)
+- Feature usage (session start, message send)
+- Outcomes (session end, success/failure)
+
+**Implementation**:
+```tsx
+import { trackEvent } from '@/lib/analytics';
+
+trackEvent('coaching_session_started', {
+  session_id: sessionId,
+  topic: topic,
+});
+```
+
+---
+
+## ♿ Accessibility Guidelines
+
+### WCAG 2.1 AA Compliance
+
+1. **Semantic HTML**: Use `<button>`, `<nav>`, `<main>`, etc.
+2. **ARIA labels**: Add `aria-label`, `aria-describedby` for screen readers
+3. **Keyboard navigation**: All interactive elements must be keyboard accessible
+4. **Focus management**: Visible focus indicators, logical tab order
+5. **Color contrast**: 4.5:1 minimum for text
+6. **Alt text**: All images need descriptive alt text
+
+**Example**:
+```tsx
+<button
+  onClick={handleClick}
+  aria-label="Start new coaching session"
+  className="focus:outline-none focus:ring-2 focus:ring-blue-600"
+>
+  Start Session
+</button>
+```
+
+---
+
+## ⚡ Performance Optimization
+
+### For Large Lists (50+ items)
+
+**Use lazy loading** instead of rendering all at once:
+```tsx
+// Only render last 50 messages by default
+const MESSAGE_LIMIT = 50;
+const visibleMessages = useMemo(() => {
+  if (showAll || messages.length <= MESSAGE_LIMIT) {
+    return messages;
+  }
+  return messages.slice(-MESSAGE_LIMIT);
+}, [messages, showAll]);
+```
+
+**Add "Load more" button**:
+```tsx
+{hasHiddenItems && (
+  <button onClick={() => setShowAll(true)}>
+    Load {total - MESSAGE_LIMIT} earlier messages
+  </button>
+)}
+```
+
+### Memoization
+
+**useMemo**: Expensive calculations
+```tsx
+const sortedItems = useMemo(() => {
+  return items.sort((a, b) => a.date - b.date);
+}, [items]);
+```
+
+**useCallback**: Event handlers passed as props
+```tsx
+const handleSubmit = useCallback(() => {
+  submitForm(data);
+}, [data]);
+```
+
+---
+
+## 🧪 Testing
+
+### E2E Tests (Playwright)
+
+**Structure**:
+```tsx
+test.describe('Coaching Session', () => {
+  test('should start a new session', async ({ page }) => {
+    await page.goto('/coaching');
+    await page.fill('[name="topic"]', 'Price elasticity');
+    await page.click('button:has-text("Start Session")');
+    await expect(page.locator('.chat-interface')).toBeVisible();
+  });
+});
+```
+
+**Coverage**: User journeys, critical paths, edge cases
+
+### Unit Tests (Jest)
+
+**Test**:
+- Validation functions
+- Utility functions
+- Data transformations
+
+**Don't test**:
+- UI components (use E2E instead)
+- Third-party libraries
+
+---
+
+## 🚨 Common Pitfalls
+
+1. **Forgetting 'use client'**: Results in "useState/useEffect can only be used in client components"
+2. **Missing error boundaries**: Crashes entire page instead of showing error UI
+3. **No loading states**: Users see blank screen during data fetch
+4. **Accessibility**: Missing aria-labels, keyboard navigation
+5. **Performance**: Rendering 100+ items without virtualization
+6. **Analytics**: Not tracking user actions for product insights
+
+---
+
+## 📝 Naming Conventions
+
+**Files**: PascalCase for components (`ChatInterface.tsx`), camelCase for utilities (`analytics.ts`)
+**Components**: PascalCase (`function ChatInterface()`)
+**Hooks**: camelCase with `use` prefix (`useToast`, `useSession`)
+**Types**: PascalCase (`interface SessionData`)
+**Constants**: UPPER_SNAKE_CASE (`const MESSAGE_LIMIT = 50`)
+
+---
+
+## 🔄 Next Features
+
+**Planned**:
+- Dark mode support
+- Internationalization (i18n)
+- PWA capabilities (offline support)
+- Advanced analytics (heatmaps, session replay)
+- A/B testing framework
+
+---
+
+**Version**: 1.0.0
+**Last Updated**: 2025-12-22
+**Maintained By**: My Personal Examiner Development Team

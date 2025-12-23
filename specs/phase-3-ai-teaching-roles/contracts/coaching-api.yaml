@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: Coach Agent API
+  description: Personalized tutoring with Socratic questioning for difficult concepts
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+
+paths:
+  /coaching/tutor-session:
+    post:
+      summary: Start a tutoring session
+      description: |
+        Initiate personalized tutoring session with Coach Agent.
+        Coach uses Socratic method to diagnose misconceptions and provides scaffolded learning.
+      operationId: startTutoringSession
+      tags:
+        - Coaching
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - topic
+                - struggle_description
+                - student_id
+              properties:
+                topic:
+                  type: string
+                  maxLength: 500
+                  description: Topic the student is struggling with
+                  example: "price elasticity of demand"
+                struggle_description:
+                  type: string
+                  description: Detailed description of what the student doesn't understand
+                  example: "I don't understand why PED is negative and what it means for businesses"
+                student_id:
+                  type: string
+                  format: uuid
+                previous_session_id:
+                  type: string
+                  format: uuid
+                  description: Optional - continue a previous session
+
+      responses:
+        '201':
+          description: Tutoring session started
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - session_id
+                  - first_question
+                  - session_status
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+                  first_question:
+                    type: string
+                    description: Socratic question to diagnose understanding
+                  session_status:
+                    type: string
+                    enum: [in_progress]
+                  estimated_duration:
+                    type: integer
+                    description: Estimated session length in minutes
+              example:
+                session_id: "abc12345-e89b-12d3-a456-426614174000"
+                first_question: "Let's start simple: Can you explain what happens to the quantity demanded when price increases?"
+                session_status: "in_progress"
+                estimated_duration: 15
+
+        '500':
+          description: LLM service error
+          content:
+            application/json:
+              schema:
+                $ref: 'teaching-api.yaml#/components/schemas/Error'
+
+  /coaching/session/{session_id}/respond:
+    post:
+      summary: Respond to coach question
+      description: Submit student's answer to current Socratic question
+      operationId: respondToCoach
+      tags:
+        - Coaching
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - student_answer
+                - student_id
+              properties:
+                student_answer:
+                  type: string
+                  description: Student's response to coach's question
+                student_id:
+                  type: string
+                  format: uuid
+
+      responses:
+        '200':
+          description: Coach's follow-up question or resolution
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - coach_response
+                  - session_status
+                properties:
+                  coach_response:
+                    type: string
+                  session_status:
+                    type: string
+                    enum: [in_progress, resolved, needs_more_help, refer_to_teacher]
+                  next_question:
+                    type: string
+                    description: Next Socratic question (if session still in progress)
+                  analogy:
+                    type: string
+                    description: Helpful analogy (if provided)
+                  summary:
+                    type: string
+                    description: Session summary (if resolved)
+
+  /coaching/session/{session_id}:
+    get:
+      summary: Get session transcript
+      description: Retrieve full conversation history
+      operationId: getSessionTranscript
+      tags:
+        - Coaching
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session transcript
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+                  topic:
+                    type: string
+                  transcript:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        role:
+                          type: string
+                          enum: [student, coach]
+                        content:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+                  outcome:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

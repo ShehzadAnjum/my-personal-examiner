@@ -1,108 +1,242 @@
-# Skill: A* Grading Rubrics
+# Skill: A* Grading Rubrics (Cambridge A-Level)
 
-**Type**: Assessment Standards
-**Created**: 2025-12-18
-**Domain**: PhD-Level Marking
-**Parent Agent**: 06-AI-Pedagogy
+**Domain**: Assessment & Grading Standards
+**Purpose**: Encode Cambridge International A* grading criteria for Economics 9708
+**Created**: 2025-12-21
+**Phase**: III (AI Teaching Roles)
+
+---
 
 ## Overview
-A* standard grading criteria for Cambridge A-Levels (90%+ total marks required).
 
-## Constitutional Requirement
-**Principle II**: A* Standard Marking Always - PhD-level strictness, no compromises.
+This skill provides the exact grading criteria used by Cambridge International examiners to award A* grades in Economics 9708. All marking must align with official mark schemes and examiner reports.
 
-## A* Characteristics (All Must Be Present)
+---
 
-### 1. Knowledge (AO1)
-- ✅ Precise, accurate definitions
-- ✅ Comprehensive understanding demonstrated
-- ✅ Technical terminology used correctly throughout
-- ✅ No factual errors
+## A* Grade Definition
 
-### 2. Application (AO2)
-- ✅ Highly relevant, specific examples
-- ✅ Clear connection between theory and context
-- ✅ Appropriate use of data/evidence
-- ✅ Real-world scenarios referenced accurately
+**Overall Requirement**: ≥90% on A2 (Paper 3 + Paper 4) AND ≥80% on overall A-Level
 
-### 3. Analysis (AO3a)
-- ✅ Well-developed chains of reasoning
-- ✅ Cause-effect relationships explicitly stated
-- ✅ Diagrams present and fully labeled
-- ✅ Short-run AND long-run effects considered
-- ✅ Assumptions explicitly stated
-- ✅ Logical flow throughout
+**Characteristics** (from Cambridge Examiner Reports):
+- Demonstrates comprehensive and accurate knowledge
+- Applies theory to real-world scenarios with precision
+- Evaluates arguments with depth, balance, and perceptiveness
+- Communicates with clarity, logic, and economic terminology
 
-### 4. Evaluation (AO3b)
-- ✅ Arguments on BOTH sides presented
-- ✅ Relative importance/significance weighed
-- ✅ "It depends on..." factors identified
-- ✅ Reasoned, justified judgment (not sitting on fence)
-- ✅ Alternative viewpoints acknowledged
-- ✅ Stakeholder perspectives considered
+---
 
-## A* vs A Distinction
+## Assessment Objectives (AO1/AO2/AO3)
 
-**A Answer** (80-89%):
-- Sound knowledge, few minor errors
-- Generally effective application
-- Clear analysis but may lack depth
-- Evaluation present but possibly one-sided
+### AO1: Knowledge and Understanding (30-40% of marks)
 
-**A* Answer** (90%+):
-- Flawless knowledge, zero errors
-- Highly effective, precise application
-- Sophisticated, multi-layered analysis
-- Balanced, nuanced evaluation with reasoned judgment
+**A* Standard**:
+- Accurate definitions with economic terminology
+- Comprehensive coverage of relevant concepts
+- Correct identification of key principles
+- No conceptual errors
 
-## Deduction Triggers (Prevents A*)
+**Example** (Perfect AO1):
+```
+Question: Define price elasticity of demand.
+A* Answer: "Price elasticity of demand (PED) measures the responsiveness of quantity demanded to a change in price, calculated as % change in QD ÷ % change in price. If |PED| > 1, demand is elastic; if |PED| < 1, demand is inelastic; if |PED| = 1, demand is unit elastic."
 
-### Automatic Deductions:
-- ❌ Any factual error (-2 to -5 marks)
-- ❌ Missing diagram when required (-3 to -5 marks)
-- ❌ One-sided evaluation (-4 to -6 marks)
-- ❌ No clear judgment/conclusion (-3 to -5 marks)
-- ❌ Generic examples ("many countries") (-2 to -3 marks)
-- ❌ Weak chain of reasoning (-3 to -5 marks)
-
-## Feedback Template for Non-A*
-
-```markdown
-## Why This Score: [XX/25 - Grade A]
-
-### Strengths:
-- Clear knowledge of [concept]
-- Relevant diagram showing [X]
-- Sound analysis of [Y]
-
-### Why Not A*:
-- Evaluation was one-sided (only considered benefits, not costs)
-- Missing consideration of [alternative factor]
-- Example was generic rather than specific
-
-### How to Reach A*:
-1. Present arguments on BOTH sides before judgment
-2. Consider "it depends on..." factors (e.g., elasticity, time period)
-3. Use specific examples with data ("UK 2020 inflation rose to 2.5%")
-4. Develop longer chains of reasoning (A causes B, which leads to C, resulting in D)
+Why A*: Complete formula, clear definition, full classification.
 ```
 
-## Usage in Marking Engine
+---
 
-```python
-def calculate_grade(total_marks: int, max_marks: int) -> str:
-    """Calculate Cambridge A-Level grade"""
-    percentage = (total_marks / max_marks) * 100
+### AO2: Application (30-40% of marks)
 
-    if percentage >= 90:
-        return "A*"  # Exceptional - all AOs at highest level
-    elif percentage >= 80:
-        return "A"   # Excellent
-    elif percentage >= 70:
-        return "B"   # Very Good
-    # ...
+**A* Standard**:
+- Real-world examples that perfectly illustrate theory
+- Accurate diagrams with all labels (axes, curves, shifts, equilibrium)
+- Correct calculations shown with working
+- Context-specific application (not generic)
+
+**Example** (Perfect AO2):
+```
+Question: Use a diagram to show the effect of a subsidy on producers.
+A* Answer: [Draws supply/demand diagram showing:
+- Original supply curve S1
+- New supply curve S2 (shifted right by subsidy amount)
+- Original equilibrium E1, new equilibrium E2
+- Subsidy per unit marked
+- Price paid by consumers vs price received by producers shown
+- All axes labeled (Price, Quantity)]
+
+Why A*: Complete diagram, all shifts shown, subsidy incidence visible.
 ```
 
-**Usage:** 0 times (Phase III not started)
-**Will Use:** Every marking task (100+ times)
-**Version**: 1.0.0 | **Last Updated**: 2025-12-18
+---
+
+### AO3: Evaluation (20-30% of marks)
+
+**A* Standard**:
+- Balanced arguments (considers both sides)
+- Justified conclusion ("depends on..." with conditions)
+- Perceptive analysis (goes beyond obvious points)
+- Uses economic criteria (efficiency, equity, sustainability)
+
+**A* Evaluation Checklist**:
+- [ ] States assumption/condition
+- [ ] Explains impact in this case
+- [ ] Contrasts with alternative scenario
+- [ ] Reaches qualified conclusion
+
+**Example** (Perfect AO3):
+```
+Question: Evaluate whether minimum wage helps low-income workers.
+A* Answer: "The impact depends on the elasticity of demand for labor. If labor demand is inelastic, employers cannot easily reduce hiring, so workers benefit from higher wages with minimal unemployment (as seen in UK 2015-2020 data). However, if demand is elastic (e.g., hospitality sector with high substitutability), firms may lay off workers or automate, reducing total income for this group. Therefore, minimum wage effectiveness depends on sector-specific PED and availability of substitutes. In sectors with inelastic demand and high barriers to automation, minimum wage likely benefits workers; in competitive sectors with elastic demand, it may harm employment."
+
+Why A*: Considers both outcomes, uses economic criteria (elasticity), cites real evidence, qualified conclusion based on conditions.
+```
+
+---
+
+## Level Descriptors (Essay Questions)
+
+### Level 3 (Top Band) - A* Range
+
+**Characteristics**:
+- Sophisticated economic understanding
+- Well-developed arguments
+- Effective evaluation
+- Logical structure
+- Precise terminology
+
+**Typical Marks**: 18-25/25 or 22-30/30
+
+**Indicators**:
+- Uses phrases like "depends on," "in the short run," "assuming"
+- Provides real-world examples with data
+- Challenges assumptions
+- Weighs trade-offs explicitly
+
+---
+
+### Level 2 (Middle Band) - B/C Range
+
+**Characteristics**:
+- Sound knowledge
+- Basic application
+- Some evaluation (but limited depth)
+- Generally accurate
+
+**Typical Marks**: 11-17/25 or 14-21/30
+
+**Why Not A***:
+- Generic examples without context
+- One-sided arguments
+- Conclusion not justified
+- Missing diagram labels
+
+---
+
+### Level 1 (Bottom Band) - D/E Range
+
+**Characteristics**:
+- Limited knowledge
+- Weak application
+- Minimal evaluation
+- Errors in understanding
+
+**Typical Marks**: 1-10/25 or 1-13/30
+
+---
+
+## Common Marking Errors to Avoid
+
+### 1. Rewarding Effort, Not Understanding
+❌ Wrong: "Student tried hard, give 7/10"
+✅ Right: "Student stated definition but didn't explain mechanism, 4/10 per mark scheme"
+
+### 2. Accepting Incomplete Diagrams
+❌ Wrong: "Diagram shows general idea, full marks"
+✅ Right: "Missing equilibrium labels, -2 marks per mark scheme"
+
+### 3. Lenient Evaluation Standards
+❌ Wrong: "Student listed pros and cons, evaluation complete"
+✅ Right: "No conclusion or justification, evaluation incomplete, max Level 2"
+
+### 4. Ignoring Economic Terminology
+❌ Wrong: "Student explained concept in plain English, acceptable"
+✅ Right: "Must use 'allocative efficiency,' not just 'resources well used,' -1 mark"
+
+---
+
+## Mark Scheme Application Rules
+
+### Rule 1: Criterion-by-Criterion
+Award marks for each distinct point, not overall quality.
+
+**Example Mark Scheme**:
+```
+1 mark: Define supply
+1 mark: State law of supply
+1 mark: Draw diagram
+1 mark: Label axes correctly
+1 mark: Explain why supply slopes upward
+Max 5 marks
+```
+
+### Rule 2: Benefit of the Doubt (Carefully)
+If student's meaning is clear despite poor wording, award mark.
+If ambiguous or potentially wrong, do NOT award.
+
+### Rule 3: Double Penalty Avoidance
+Don't deduct marks twice for same error.
+
+**Example**:
+- Student miscalculates PED = -0.5 (error)
+- Then concludes demand is inelastic (logical given their calculation)
+- Deduct marks ONLY for calculation error, NOT conclusion
+
+### Rule 4: Error Carried Forward
+If student makes early error but applies it correctly later, award subsequent marks.
+
+---
+
+## A* Model Answer Characteristics
+
+When generating A* model answers (Reviewer Agent), include:
+
+1. **Introduction** (if essay): Brief context + thesis statement
+2. **Body Paragraphs**:
+   - Topic sentence (economic concept)
+   - Explanation (mechanism)
+   - Diagram/Example (application)
+   - Analysis (why this matters)
+3. **Evaluation** (always):
+   - Assumptions stated
+   - Alternative scenarios
+   - Conditions under which conclusion holds
+4. **Conclusion** (if essay):
+   - Summarize key trade-offs
+   - Qualified judgment ("In most cases... However, if...")
+
+**Word Count**:
+- 10-mark question: 200-300 words + diagram
+- 25-mark question: 600-800 words + diagrams
+
+---
+
+## Confidence Scoring Integration
+
+**When to Flag for Manual Review** (<70% confidence):
+- Borderline between levels (e.g., 16-18/25)
+- Ambiguous wording in answer
+- Unusual but potentially valid approach
+- Diagram partially correct but unclear
+- Evaluation present but depth uncertain
+
+---
+
+## Constitutional Alignment
+
+- **Principle II**: A* Standard Marking Always → Strict application of rubrics
+- **Principle VI**: Constructive Feedback → Explain why marks awarded/deducted
+
+---
+
+**Version**: 1.0.0 | **Created**: 2025-12-21
+**Source**: Cambridge International AS & A Level Economics (9708) Syllabus 2023-2025

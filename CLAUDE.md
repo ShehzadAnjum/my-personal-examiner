@@ -226,3 +226,10 @@ my_personal_examiner/
 **Methodology**: SpecKitPlus (Strict compliance enforced)
 
 🎓 **Remember**: Every decision affects students' A-Level exam success. Quality over speed. Always.
+
+## Active Technologies
+- TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+ (004-coaching-page)
+- Backend PostgreSQL (via API calls), browser localStorage for session persistence (004-coaching-page)
+
+## Recent Changes
+- 004-coaching-page: Added TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+

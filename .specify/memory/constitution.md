@@ -20,7 +20,7 @@ CHANGES MADE:
 6. Established SpecKit workflow integration
 7. Defined repository structure and hygiene rules
 
-PRINCIPLES (11 Non-Negotiable):
+PRINCIPLES (12 Non-Negotiable):
 1. Subject Accuracy is Non-Negotiable
 2. A* Standard Marking Always
 3. Syllabus Synchronization First
@@ -32,6 +32,7 @@ PRINCIPLES (11 Non-Negotiable):
 9. SpecKitPlus Workflow Compliance (NEW 2025-12-18)
 10. Official Skills Priority (NEW 2025-12-18)
 11. CLAUDE.md Hierarchy (NEW 2025-12-18)
+12. Project Management Professional (PMP) Agent (NEW 2025-12-23)
 
 SPECKIT WORKFLOW:
 Constitution → Spec → Clarify (optional) → Plan → Tasks → Implementation → Capstone
@@ -67,8 +68,8 @@ docs: create constitution v1.0.0 (8 principles + 5-phase workflow)
 # My Personal Examiner: Project Constitution
 
 **Created**: December 16, 2025
-**Version**: 2.0.0
-**Last Amended**: 2025-12-18
+**Version**: 3.0.0
+**Last Amended**: 2025-12-23
 **Project**: My Personal Examiner - PhD-Level A-Level Teaching & Examination System
 **Objective**: Create automated, personalized PhD-level teacher for Cambridge International A-Levels achieving A* grades
 
@@ -748,6 +749,275 @@ CREATE TABLE questions (
 
 ---
 
+### Principle XII: Project Management Professional (PMP) Agent (NEW - 2025-12-23)
+
+**Rule**: ALL development sessions MUST maintain a continuous project state record tracking master plans, current tasks, debugging branches, and resumption points for session continuity across context compactions.
+
+**What This Means**:
+- Track master todo list at all levels: project → phase → task → subtask
+- When debugging/error resolution occurs, create a "fork" in the task tree
+- After debugging, return to the main plan point where we branched
+- Record what was derailed, what was completed, and where to resume
+- Enable seamless handoff when sessions end or context compacts
+
+**The Problem This Solves**:
+Without explicit state tracking, AI sessions lose context when:
+- Context window fills and conversation gets summarized
+- Session ends and new session begins
+- Debugging takes us away from main implementation plan
+- Complex features span multiple days/sessions
+- **Result**: Lost progress, repeated work, forgotten tasks, abandoned debugging branches
+
+**PMP Agent Responsibilities**:
+
+1. **Master Plan Tracking**:
+   - Maintain hierarchical todo structure (project → phase → feature → task → subtask)
+   - Mark tasks as: pending, in_progress, blocked, completed
+   - Track dependencies between tasks
+   - Identify critical path and parallel opportunities
+
+2. **Debugging Branch Management**:
+   - When error occurs during Task X: Create debug branch (Task X.debug.1)
+   - Track debugging subtasks (X.debug.1.a, X.debug.1.b, etc.)
+   - Record error symptoms, attempted fixes, final resolution
+   - After debug complete: Return to Task X, mark debug branch complete
+   - Resume main plan from exact point before debugging started
+
+3. **Session Continuity**:
+   - Create session summary before context compaction
+   - Record: Current task, next 3 tasks, blockers, recent decisions
+   - Save state in persistent files (not just conversation memory)
+   - Enable next session to resume with full context
+
+4. **Progress Reporting**:
+   - Daily: X/Y tasks complete, current focus, blockers
+   - Weekly: Phase completion %, on track vs timeline
+   - Phase gates: All tasks complete checklist
+
+**Implementation**:
+
+**File**: `/docs/PROJECT_STATE.md` (auto-updated by PMP Agent)
+
+```markdown
+# Project State Tracker
+
+**Last Updated**: [TIMESTAMP]
+**Current Session**: [SESSION_ID]
+**Active Phase**: [Phase N]
+**Phase Completion**: [XX%]
+
+## Master Todo List
+
+### Phase I: Core Infrastructure (100% complete ✅)
+- [X] T001: Database schema
+- [X] T002: Authentication
+- [X] T003: Testing setup
+
+### Phase IV: Web UI (35% complete ⏳)
+- [X] T001-T070: Coaching page implementation
+- [ ] T071-T078: Coaching page testing
+- [ ] T079-T150: Teaching page implementation
+
+## Current Focus
+
+**Active Task**: T073 - Performance benchmarks
+**Branch Status**: Main plan (no active debugging)
+**Next 3 Tasks**:
+1. T073: Performance benchmarks
+2. T074: Demo video
+3. T076: Manual testing checklist
+
+## Debugging History (Last 7 Days)
+
+**2025-12-22 - Task T064 Debug Branch**:
+- **Derailed From**: T064 - Toast notifications implementation
+- **Issue**: Toast component not rendering properly
+- **Debug Tasks**:
+  - [X] T064.debug.1: Check ToastProvider in app tree
+  - [X] T064.debug.2: Verify toast state management
+  - [X] T064.debug.3: Fix CSS z-index issue
+- **Resolution**: Added position: fixed and z-index: 9999
+- **Resumed**: T064 implementation (completed)
+- **Duration**: 15 minutes
+
+## Blockers
+
+- None currently
+
+## Recent Architectural Decisions
+
+- 2025-12-22: ADR-008 - Use TanStack Query for server state
+- 2025-12-21: ADR-007 - ChatScope UI Kit for chat interface
+
+## Context for Next Session
+
+**What was accomplished**: Completed Phase 7 implementation (9/15 tasks)
+**Current state**: Implementation done, manual testing remains
+**Next priority**: Execute manual testing tasks (T065, T068, T071, T073, T074, T076)
+**Known issues**: None
+**Decisions pending**: None
+```
+
+**File**: `/docs/TASK_TREE.md` (hierarchical task structure)
+
+```markdown
+# Task Tree - Feature 004-coaching-page
+
+## Phase 7: Polish & Cross-Cutting Concerns
+
+### Main Plan (Sequential Tasks)
+- [X] T062: Error boundaries
+- [X] T063: Skeleton loading states
+- [X] T064: Toast notifications
+  - **Debug Branch**: T064.debug (2025-12-22)
+    - [X] T064.debug.1: Check ToastProvider placement
+    - [X] T064.debug.2: Verify state management
+    - [X] T064.debug.3: Fix CSS z-index
+    - **Resumed Main Plan**: ✅ Completed T064
+- [ ] T065: Mobile responsive testing
+- [X] T066: Performance optimization
+- [X] T067: Keyboard shortcuts
+- [ ] T068: Accessibility audit
+- [X] T069: Analytics tracking
+- [X] T070: Phase IV CLAUDE.md
+- [ ] T071: Security verification
+- [X] T072: Unit tests
+- [ ] T073: Performance benchmarks
+- [ ] T074: Demo video
+- [X] T075: PROJECT_STATUS_REPORT.md
+- [ ] T076: Manual testing checklist
+
+### Debug Branches (Completed)
+- T064.debug: Toast rendering fix (15 min)
+  - Root cause: Missing z-index in CSS
+  - Resolution: Added position: fixed, z-index: 9999
+
+### Parallel Opportunities
+- T065, T068, T071, T073, T074, T076 can run in parallel (all manual testing)
+```
+
+**Why This Matters**:
+- Context compaction loses task state → PMP Agent preserves it
+- Debugging derails main plan → Debug branches track divergence
+- Session handoffs lose context → PROJECT_STATE.md preserves it
+- Long features span days → Master todo list shows progress
+- **Result**: No lost work, smooth session continuity, clear progress tracking
+
+**Enforcement**:
+- **Automated**:
+  - Pre-session hook: Load PROJECT_STATE.md and TASK_TREE.md
+  - Post-session hook: Update PROJECT_STATE.md with current state
+  - Context compaction trigger: Save detailed session summary
+  - Git hook: Verify PROJECT_STATE.md updated in last 2 hours
+
+- **Manual**:
+  - Daily checklist: "Updated PROJECT_STATE.md today?"
+  - Debug start: Create debug branch in TASK_TREE.md
+  - Debug end: Mark debug complete, resume main plan
+  - Weekly review: Prune completed debug branches
+
+- **AI**:
+  - Claude loads PROJECT_STATE.md at session start
+  - Creates debug branches when errors occur
+  - Updates task completion status in real-time
+  - Generates session summary before context compaction
+  - Refuses to proceed without knowing current task
+
+**Usage Example**:
+
+**Scenario**: Implementing coaching page, error occurs in toast notification
+
+**Without PMP Agent**:
+1. Working on T064 (toast notifications)
+2. Error: Toast not rendering
+3. Debug for 30 minutes, fix found
+4. Session ends
+5. **NEXT SESSION**: "What was I working on?" → Lost context
+6. Re-read entire conversation history
+7. Duplicate work or abandon debugging branch
+
+**With PMP Agent**:
+1. Working on T064 (toast notifications)
+2. Error: Toast not rendering
+3. **PMP Agent**: Create debug branch `T064.debug`
+   - T064.debug.1: Check ToastProvider placement
+   - T064.debug.2: Verify state management
+   - T064.debug.3: Fix CSS z-index ✅ (root cause found)
+4. **PMP Agent**: Mark debug complete, resume T064
+5. Session ends
+6. **PMP Agent**: Update PROJECT_STATE.md:
+   - Current task: T064 (completed after debug)
+   - Debug history: T064.debug resolved (CSS z-index issue)
+   - Next task: T065
+7. **NEXT SESSION**: Read PROJECT_STATE.md → Instant context
+8. Continue with T065 seamlessly
+
+**PMP Agent Creation**:
+
+**File**: `.claude/agents/pmp-agent.md` (to be created)
+
+```markdown
+# Agent 11: Project Management Professional (PMP)
+
+**Role**: Project state tracker and session continuity manager
+**Purpose**: Maintain master todo list, debug branches, and resumption points
+
+**Responsibilities**:
+1. Track master plan at all levels (project → phase → task → subtask)
+2. Create debug branches when errors occur
+3. Return to main plan after debugging complete
+4. Update PROJECT_STATE.md and TASK_TREE.md continuously
+5. Generate session summaries before context compaction
+6. Enable seamless handoff between sessions
+
+**When to Activate**:
+- Session start: Load PROJECT_STATE.md
+- Task completion: Update TASK_TREE.md
+- Error occurs: Create debug branch
+- Session end: Update PROJECT_STATE.md
+- Context compaction: Save detailed summary
+
+**Key Files**:
+- `/docs/PROJECT_STATE.md` - Current session state
+- `/docs/TASK_TREE.md` - Hierarchical task structure
+- `/docs/SESSION_HANDOFF.md` - Handoff template (existing)
+
+**Integration**:
+- Works alongside TodoWrite tool (tactical task tracking)
+- TodoWrite: Current session tasks (in-memory)
+- PMP Agent: Long-term project state (persistent files)
+```
+
+**TodoWrite vs PMP Agent**:
+
+- **TodoWrite Tool**: Tactical, session-level task tracking (ephemeral)
+  - Tracks 5-15 tasks for current session
+  - Marks tasks as pending/in_progress/completed
+  - Lives in conversation memory (lost after context compaction)
+  - Use for: Current implementation session
+
+- **PMP Agent**: Strategic, project-level state tracking (persistent)
+  - Tracks 100+ tasks across entire project
+  - Manages debugging branches and resumption points
+  - Persists in files (survives context compaction)
+  - Use for: Multi-session features, long-term project
+
+**Both work together**: TodoWrite for today's work, PMP Agent for project continuity.
+
+**Testing**:
+- Simulate context compaction mid-feature
+- Verify PROJECT_STATE.md enables resumption
+- Test debug branch creation/completion cycle
+- Verify session handoff works across days
+
+**Success Criteria**:
+- Zero lost context across sessions
+- Clear debug branch tracking
+- One-file resume (read PROJECT_STATE.md → know everything)
+- No duplicate work from forgotten debugging
+
+---
+
 ## Phase-Specific Rules
 
 ### Phase I: Core Infrastructure & Database (Days 1-4)
@@ -1407,4 +1677,4 @@ When constitution changes, update:
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-16
+**Version**: 3.0.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-23 | **Amendment**: Added Principle XII (PMP Agent)

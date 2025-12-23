@@ -64,6 +64,24 @@ def session_fixture(engine):
         yield session
 
 
+@pytest.fixture(name="db_session")
+def db_session_fixture(engine):
+    """
+    Alias for session fixture (for integration tests compatibility)
+
+    Each test gets a fresh session with empty database.
+    Rollback happens automatically after test completes.
+
+    Args:
+        engine: Test database engine (from engine_fixture)
+
+    Yields:
+        Session: SQLModel session for test
+    """
+    with Session(engine) as session:
+        yield session
+
+
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
     """
