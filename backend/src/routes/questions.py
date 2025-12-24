@@ -406,8 +406,7 @@ async def get_question(
             ...
         }
     """
-    stmt = select(Question).where(Question.id == question_id)
-    question = db.exec(stmt).first()
+    question = db.get(Question, question_id)
 
     if not question:
         raise HTTPException(
@@ -415,7 +414,24 @@ async def get_question(
             detail=f"Question {question_id} not found",
         )
 
-    return question.model_dump()
+    # Convert to dict manually to avoid serialization issues
+    return {
+        "id": str(question.id),
+        "subject_id": str(question.subject_id),
+        "question_text": question.question_text,
+        "max_marks": question.max_marks,
+        "difficulty": question.difficulty,
+        "source_paper": question.source_paper,
+        "paper_number": question.paper_number,
+        "question_number": question.question_number,
+        "year": question.year,
+        "session": question.session,
+        "marking_scheme": question.marking_scheme,
+        "syllabus_point_ids": question.syllabus_point_ids,
+        "file_path": question.file_path,
+        "created_at": question.created_at.isoformat() if question.created_at else None,
+        "updated_at": question.updated_at.isoformat() if question.updated_at else None,
+    }
 
 
 # ========================================================================
@@ -516,4 +532,17 @@ async def get_mark_scheme(
             detail=f"Mark scheme {source_paper} not found",
         )
 
-    return mark_scheme.model_dump()
+    # Convert to dict manually to avoid serialization issues
+    return {
+        "id": str(mark_scheme.id),
+        "subject_id": str(mark_scheme.subject_id),
+        "source_paper": mark_scheme.source_paper,
+        "mark_scheme_text": mark_scheme.mark_scheme_text,
+        "question_paper_filename": mark_scheme.question_paper_filename,
+        "paper_number": mark_scheme.paper_number,
+        "year": mark_scheme.year,
+        "session": mark_scheme.session,
+        "file_path": mark_scheme.file_path,
+        "created_at": mark_scheme.created_at.isoformat() if mark_scheme.created_at else None,
+        "updated_at": mark_scheme.updated_at.isoformat() if mark_scheme.updated_at else None,
+    }

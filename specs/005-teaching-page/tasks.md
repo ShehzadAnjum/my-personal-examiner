@@ -61,11 +61,11 @@
 
 - [X] T013 [P] [US1] Create ExplanationSection collapsible component in frontend/components/teaching/ExplanationSection.tsx (uses shadcn/ui Accordion, props: title, children, defaultExpanded, icon)
 - [X] T014 [P] [US1] Create BookmarkButton component in frontend/components/teaching/BookmarkButton.tsx (props: isBookmarked, onClick, isLoading, integrates useBookmark hook)
-- [ ] T015 [P] [US1] Create ExplanationSkeleton loading component in frontend/components/teaching/ExplanationSkeleton.tsx (pulse animation, mimics ExplanationView structure)
-- [ ] T016 [US1] Create ExplanationView component in frontend/components/teaching/ExplanationView.tsx (props: explanation, isBookmarked, onBookmarkToggle, displays all 9 sections using ExplanationSection, Definition/Core Principles/Related expanded by default, Examples/Misconceptions/Practice collapsed)
-- [ ] T017 [US1] Create explanation page route in frontend/app/(dashboard)/teaching/[topicId]/page.tsx (uses useExplanation hook, displays ExplanationSkeleton during loading, renders ExplanationView when loaded, integrates BookmarkButton)
-- [ ] T018 [US1] Add error boundary for teaching routes in frontend/app/(dashboard)/teaching/error.tsx (reuse pattern from 004-coaching-page, user-friendly error messages, retry option)
-- [ ] T019 [US1] Test explanation display end-to-end: select topic "3.1.2 PED" from topic list, verify AI generates explanation within 10 seconds, verify all 9 components present, verify collapsible sections work, verify typography is clear and readable
+- [X] T015 [P] [US1] Create ExplanationSkeleton loading component in frontend/components/teaching/ExplanationSkeleton.tsx (pulse animation, mimics ExplanationView structure)
+- [X] T016 [US1] Create ExplanationView component in frontend/components/teaching/ExplanationView.tsx (props: explanation, isBookmarked, onBookmarkToggle, displays all 9 sections using ExplanationSection, Definition/Core Principles/Related expanded by default, Examples/Misconceptions/Practice collapsed)
+- [X] T017 [US1] Create explanation page route in frontend/app/(dashboard)/teaching/[topicId]/page.tsx (uses useExplanation hook, displays ExplanationSkeleton during loading, renders ExplanationView when loaded, integrates BookmarkButton)
+- [X] T018 [US1] Add error boundary for teaching routes in frontend/app/(dashboard)/teaching/error.tsx (reuse pattern from 004-coaching-page, user-friendly error messages, retry option)
+- [X] T019 [US1] Test explanation display end-to-end: select topic "3.1.2 PED" from topic list, verify AI generates explanation within 10 seconds, verify all 9 components present, verify collapsible sections work, verify typography is clear and readable
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - students can view comprehensive explanations for any Economics 9708 topic
 
@@ -79,12 +79,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create TopicCard component in frontend/components/teaching/TopicCard.tsx (props: topic, onClick, showRemoveButton, onRemove, displays topic code, description, learning outcomes preview)
-- [ ] T021 [P] [US2] Create TopicBrowser hierarchical tree component in frontend/components/teaching/TopicBrowser.tsx (props: topics from useTopics hook, organizes by AS/A2 level and paper number, renders TopicCard for each topic, onClick navigates to /teaching/[topicId])
-- [ ] T022 [P] [US2] Create TopicSearch search bar component in frontend/components/teaching/TopicSearch.tsx (props: topics, onSelectTopic, implements client-side search with useMemo filtering on code/description/learning_outcomes, 300ms debounce, highlights matching keywords with mark tag, shows result count and "No results" state)
-- [ ] T023 [P] [US2] Create TopicSearchSkeleton loading component in frontend/components/teaching/TopicSearchSkeleton.tsx (pulse animation for search bar and topic grid)
-- [ ] T024 [US2] Create main teaching page route in frontend/app/(dashboard)/teaching/page.tsx (uses useTopics hook, displays TopicBrowser and TopicSearch components, handles loading state with TopicSearchSkeleton, shows error toast if topics fail to load)
-- [ ] T025 [US2] Integrate client-side search filtering logic in TopicSearch component (Array.filter on topics by search query, case-insensitive match on code/description/learning_outcomes, instant results <1ms for 200 topics)
+- [X] T020 [P] [US2] Create TopicCard component in frontend/components/teaching/TopicCard.tsx (props: topic, onClick, showRemoveButton, onRemove, displays topic code, description, learning outcomes preview)
+- [X] T021 [P] [US2] Create TopicBrowser hierarchical tree component in frontend/components/teaching/TopicBrowser.tsx (props: topics from useTopics hook, organizes by AS/A2 level and paper number, renders TopicCard for each topic, onClick navigates to /teaching/[topicId])
+- [X] T022 [P] [US2] Create TopicSearch search bar component in frontend/components/teaching/TopicSearch.tsx (props: topics, onSelectTopic, implements client-side search with useMemo filtering on code/description/learning_outcomes, 300ms debounce, highlights matching keywords with mark tag, shows result count and "No results" state)
+- [X] T023 [P] [US2] Create TopicSearchSkeleton loading component in frontend/components/teaching/TopicSearchSkeleton.tsx (pulse animation for search bar and topic grid)
+- [X] T024 [US2] Create main teaching page route in frontend/app/(dashboard)/teaching/page.tsx (uses useTopics hook, displays TopicBrowser and TopicSearch components, handles loading state with TopicSearchSkeleton, shows error toast if topics fail to load)
+- [X] T025 [US2] Integrate client-side search filtering logic in TopicSearch component (Array.filter on topics by search query, case-insensitive match on code/description/learning_outcomes, instant results <1ms for 200 topics)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - students can browse/search topics and view explanations
 

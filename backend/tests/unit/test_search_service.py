@@ -45,8 +45,8 @@ class TestSearchServicePagination:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 50),  # Total count
-            mocker.MagicMock(scalars=lambda: scalars_mock),  # Questions result
+            mocker.MagicMock(one=lambda: 50),  # Total count
+            mocker.MagicMock(all=lambda: []),  # Questions result
         ])
 
         results = service.search_questions(page=1, page_size=20)
@@ -63,8 +63,8 @@ class TestSearchServicePagination:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 50),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 50),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(page=2, page_size=20)
@@ -78,8 +78,8 @@ class TestSearchServicePagination:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 50),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 50),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(page=3, page_size=20)
@@ -93,8 +93,8 @@ class TestSearchServicePagination:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 10),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 10),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(page=-1, page_size=20)
@@ -106,8 +106,8 @@ class TestSearchServicePagination:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 10),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 10),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(page=1, page_size=200)
@@ -146,9 +146,9 @@ class TestSearchServiceFiltering:
         questions_scalars.__iter__ = lambda self: iter([])
 
         exec_calls = [
-            mocker.MagicMock(scalars=lambda: subject_scalars),  # Subject lookup
-            mocker.MagicMock(scalar_one=lambda: 0),  # Total count
-            mocker.MagicMock(scalars=lambda: questions_scalars),  # Questions
+            mocker.MagicMock(first=lambda: economics_subject),  # Subject lookup
+            mocker.MagicMock(one=lambda: 0),  # Total count
+            mocker.MagicMock(all=lambda: []),  # Questions
         ]
         mock_db.exec.side_effect = exec_calls
 
@@ -162,8 +162,8 @@ class TestSearchServiceFiltering:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 0),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 0),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(year=2022)
@@ -176,8 +176,8 @@ class TestSearchServiceFiltering:
         scalars_mock = mocker.MagicMock()
         scalars_mock.__iter__ = lambda self: iter([])
         mocker.patch.object(mock_db, "exec", side_effect=[
-            mocker.MagicMock(scalar_one=lambda: 0),
-            mocker.MagicMock(scalars=lambda: scalars_mock),
+            mocker.MagicMock(one=lambda: 0),
+            mocker.MagicMock(all=lambda: []),
         ])
 
         results = service.search_questions(min_marks=5, max_marks=10)
