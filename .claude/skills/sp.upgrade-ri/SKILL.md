@@ -1,21 +1,8 @@
 ---
-skill-name: sp.upgrade-ri
-type: SpecKitPlus Command
-domain: Reusable Intelligence Management
-purpose: Auto-upgrade agents and skills by extracting learnings from completed tasks
-version: 1.0.0
-last-updated: 2025-12-24
-constitutional-principles: [IX]
-capabilities:
-  - Scan tasks.md for completed tasks
-  - Extract new patterns from implemented code
-  - Append "Recent Learnings" to relevant agents
-  - Increment agent version numbers (patch bump)
-  - Detect which agents were used in tasks
-  - Extract technical decisions and alternatives
-  - Document file paths and rationale
-  - Cross-reference constitutional principles
+name: sp-upgrade-ri
+description: Upgrade reusable intelligence (agents/skills) to latest version standards. Internal skill for maintaining agent/skill quality.
 ---
+
 
 # Skill: /sp.upgrade-ri - Auto-Upgrade Reusable Intelligence
 

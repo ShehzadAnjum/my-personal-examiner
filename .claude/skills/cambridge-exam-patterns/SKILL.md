@@ -1,3 +1,8 @@
+---
+name: cambridge-exam-patterns
+description: Cambridge International A-Level exam paper structure, question patterns, and assessment formats. Use when working with past papers, exam generation, or question extraction.
+---
+
 # Skill: Cambridge Exam Patterns
 
 **Type**: Domain Expertise

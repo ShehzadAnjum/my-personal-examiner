@@ -1,3 +1,10 @@
+---
+name: syllabus-research
+description: Cambridge syllabus synchronization and research specialist. Maintains alignment with official Cambridge International syllabi, tracks updates, validates content accuracy. Use for syllabus verification, content validation, and ensuring exam alignment.
+tools: Read, Grep, Glob, WebFetch, WebSearch
+model: inherit
+---
+
 # Agent 05: Cambridge Syllabus Sync & Research
 
 **Domain**: Cambridge Syllabus Sync & Research

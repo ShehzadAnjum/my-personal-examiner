@@ -1,3 +1,8 @@
+---
+name: anthropic-api-patterns
+description: Anthropic Claude API integration patterns for AI teaching, marking, and coaching. Use when integrating Claude API, implementing AI features, or working with LLM responses.
+---
+
 # Skill: Anthropic Claude API Integration Patterns
 
 **Domain**: LLM Integration & Production Patterns

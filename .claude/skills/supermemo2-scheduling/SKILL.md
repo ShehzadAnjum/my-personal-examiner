@@ -1,3 +1,8 @@
+---
+name: supermemo2-scheduling
+description: SuperMemo 2 spaced repetition algorithm for review scheduling. Use when implementing spaced repetition, review scheduling, or memory optimization features.
+---
+
 # Skill: SuperMemo 2 (SM-2) Spaced Repetition
 
 **Domain**: Learning Science & Memory Algorithms

@@ -1,23 +1,8 @@
 ---
-skill-name: phd-pedagogy
-domain: Educational Psychology & Evidence-Based Teaching
-purpose: Implement research-backed teaching strategies for A-Level students
-parent-agent: 06-AI-Pedagogy
-version: 1.1.0
-last-updated: 2025-12-24
-constitutional-principles: [I, III, VI]
-capabilities:
-  - Socratic Method for deep learning (question-based teaching)
-  - Constructive Feedback Structure (WHY and HOW to improve)
-  - Spaced Repetition (SuperMemo 2 algorithm)
-  - Contextual Interleaving (mix related topics, not random)
-  - Cognitive Load Management (7±2 working memory limit)
-  - Metacognitive Skill Development (teach HOW to learn)
-  - A* Standard Rigor (Cambridge examiner-level marking)
-  - Evidence-based teaching (peer-reviewed research)
-  - Vygotsky's Zone of Proximal Development
-  - Bloom's Taxonomy Level 6 (Evaluate, Create)
+name: phd-pedagogy
+description: PhD-level educational content design patterns for explanations, examples, misconceptions, and practice problems. Use when designing teaching content, explanations, or educational materials.
 ---
+
 
 # Skill: PhD-Level Pedagogy
 

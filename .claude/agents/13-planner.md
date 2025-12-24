@@ -1,3 +1,10 @@
+---
+name: planner
+description: Project planning and task breakdown specialist. Creates implementation plans, generates task lists, estimates effort, manages dependencies. Use for feature planning and task generation.
+tools: Read, Write, Edit, Grep, Glob
+model: inherit
+---
+
 # Agent 13: Planner
 
 **Domain**: Study Schedule Optimization & Syllabus Coverage Planning

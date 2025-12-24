@@ -1,24 +1,8 @@
 ---
-skill-name: fastapi-route-implementation
-type: Backend Development Expertise
-domain: API Development
-parent-agent: 02-Backend-Service
-version: 1.1.0
-last-updated: 2025-12-24
-constitutional-principles: [II, V, VI]
-capabilities:
-  - FastAPI router setup with prefix and tags
-  - POST endpoints for resource creation (201 Created)
-  - POST endpoints for authentication (200 OK with JWT)
-  - GET endpoints with authentication (protected routes)
-  - GET endpoints with filtering and pagination
-  - PATCH endpoints for resource updates
-  - DELETE endpoints with soft delete
-  - Multi-tenant security (student_id verification)
-  - Error handling (domain errors → HTTP errors)
-  - Pydantic validation with custom validators
-  - OpenAPI documentation (summary, description, examples)
+name: fastapi-route-implementation
+description: Implement RESTful API endpoints using FastAPI with proper error handling, validation, and multi-tenant security. Use when creating or modifying API routes, endpoints, and controllers in the backend.
 ---
+
 
 # Skill: FastAPI Route Implementation
 

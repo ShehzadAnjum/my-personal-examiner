@@ -1,3 +1,8 @@
+---
+name: better-auth-setup
+description: Better Auth v1 setup and configuration patterns for Next.js applications. Use when implementing authentication with Better Auth library.
+---
+
 # Better-Auth Setup Skill
 
 **Version**: 1.0.0

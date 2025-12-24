@@ -1,3 +1,10 @@
+---
+name: assessment-engine
+description: Question generation and exam creation specialist. Handles PDF parsing, question extraction, mark scheme analysis, and exam assembly. Use for working with past papers, creating question banks, and generating assessments.
+tools: Read, Write, Edit, Grep, Glob, Bash
+model: inherit
+---
+
 # Agent 04: Question Generation & Exam Creation
 
 **Domain**: Question Generation & Exam Creation

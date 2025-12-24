@@ -1,3 +1,8 @@
+---
+name: multi-tenant-query-pattern
+description: Multi-tenant query patterns with student_id filtering for data isolation. Use when implementing database queries, API endpoints, or any data access requiring tenant isolation.
+---
+
 # Skill: Multi-Tenant Query Pattern
 
 **Type**: Security & Database Expertise

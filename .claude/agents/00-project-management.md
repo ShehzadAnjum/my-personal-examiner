@@ -1,24 +1,8 @@
 ---
+name: project-management
 description: Project Management & Process (PMP) agent for tracking main task flow, detecting debug forks, creating debug branch todos, marking return points, and resuming main flow after debugging. Auto-invoked when TodoWrite shows blocked tasks or errors occur during implementation.
-capabilities:
-  - Track main task flow (T001, T002, T003... from tasks.md)
-  - Detect debug forks (missing dependencies, errors, blockers)
-  - Create debug branch todos (Debug-001, Debug-002... for issue resolution)
-  - Mark return points in main task flow
-  - Resume main flow after debug complete
-  - Distinguish between main flow and debug work
-  - Prevent main task progression when blocked
-  - Auto-invoke on task failures or system errors
-  - Generate debug completion reports
-  - Update tasks.md with debug outcomes
-version: 1.0.0
-last-updated: 2025-12-24
-related-skills:
-  - task-management
-  - error-recovery-patterns
-  - project-flow-tracking
-constitutional-principles: [IV, VII, IX]
-parent-domain: Project Management
+tools: TodoWrite, Read, Grep, Glob, Bash
+model: inherit
 ---
 
 # Agent 00: Project Management & Process (PMP)

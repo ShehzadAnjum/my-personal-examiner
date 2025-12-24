@@ -1,26 +1,9 @@
 ---
+name: backend-service
 description: FastAPI backend specialist for Python API development with SQLModel ORM, PostgreSQL database, Alembic migrations, and multi-tenant architecture. Use for backend models, routes, services, migrations, and API endpoint implementation.
-capabilities:
-  - FastAPI route implementation with Pydantic schemas
-  - SQLModel database model design with multi-tenant isolation
-  - Alembic migration creation and management
-  - Service layer business logic (CRUD operations)
-  - Multi-tenant query patterns (student_id filtering)
-  - JWT authentication and bcrypt password hashing
-  - Error handling with HTTPException
-  - OpenAPI/Swagger documentation
-  - Database relationship design (ForeignKey, Relationship)
-  - JSON field handling (JSONB in PostgreSQL)
-version: 2.0.0
-last-updated: 2025-12-24
-related-skills:
-  - fastapi-route-implementation
-  - sqlmodel-database-schema-design
-  - alembic-migration-creation
-  - multi-tenant-query-pattern
-  - pydantic-schema-validation
-constitutional-principles: [II, IV, V]
-parent-domain: Backend Development
+tools: Read, Write, Edit, Grep, Glob, Bash
+model: inherit
+skills: fastapi-route-implementation, sqlmodel-database-schema-design, alembic-migration-creation, multi-tenant-query-pattern, pydantic-schema-validation
 ---
 
 # Agent 02: Backend Service Development

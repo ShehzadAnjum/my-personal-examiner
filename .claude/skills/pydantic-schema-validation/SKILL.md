@@ -1,3 +1,8 @@
+---
+name: pydantic-schema-validation
+description: Pydantic schema design and validation patterns for FastAPI request/response models. Use when creating API schemas, validation logic, or data transfer objects.
+---
+
 # Skill: Pydantic Schema Validation
 
 **Type**: Backend Development Expertise

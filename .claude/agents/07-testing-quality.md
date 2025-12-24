@@ -1,26 +1,11 @@
 ---
+name: testing-quality
 description: Testing and quality assurance specialist for WCAG 2.1 AA accessibility compliance, Lighthouse performance audits, Playwright E2E testing, pytest/Jest unit testing, and mobile responsive validation. Use for quality gates, test automation, and performance optimization.
-capabilities:
-  - WCAG 2.1 AA accessibility compliance testing
-  - Lighthouse performance audits (90+ target score)
-  - Playwright E2E test automation
-  - pytest unit testing (>80% coverage required)
-  - Jest/React Testing Library component testing
-  - Mobile responsive testing (320px-2560px)
-  - Visual regression testing
-  - Performance optimization (Core Web Vitals)
-  - Load testing and stress testing
-  - Security testing (OWASP Top 10)
-version: 2.0.0
-last-updated: 2025-12-24
-related-skills:
-  - playwright-e2e-testing
-  - pytest-unit-testing
-  - wcag-accessibility-patterns
-  - lighthouse-performance-optimization
-constitutional-principles: [II, VII, VIII]
-parent-domain: Quality Assurance
+tools: Read, Write, Edit, Bash, Grep, Glob
+model: inherit
+skills: pytest-testing-patterns
 ---
+
 
 # Agent 07: Testing & Quality Assurance
 

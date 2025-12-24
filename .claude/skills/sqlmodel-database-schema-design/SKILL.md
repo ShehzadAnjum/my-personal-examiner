@@ -1,23 +1,8 @@
 ---
-skill-name: sqlmodel-database-schema-design
-type: Backend Development Expertise
-domain: Database Architecture
-parent-agent: 02-Backend-Service
-version: 1.1.0
-last-updated: 2025-12-24
-constitutional-principles: [IV, V]
-capabilities:
-  - SQLModel table model design with Pydantic validation
-  - UUID primary keys with default_factory
-  - Multi-tenant isolation (student_id foreign keys)
-  - JSONB fields for complex structured data
-  - Composite indexes for query optimization
-  - Check constraints for data integrity
-  - Soft delete patterns
-  - Foreign key relationships with CASCADE DELETE
-  - Timestamp fields with auto-update
-  - Array fields (PostgreSQL-specific)
+name: sqlmodel-database-schema-design
+description: SQLModel database schema design with multi-tenant patterns, relationships, and PostgreSQL best practices. Use when designing database models, migrations, or query patterns.
 ---
+
 
 # Skill: SQLModel Database Schema Design
 

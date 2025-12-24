@@ -113,13 +113,13 @@
 
 **Purpose**: Improvements that affect multiple user stories and ensure production readiness
 
-- [ ] T030 [P] Add accessibility features: keyboard navigation for TopicBrowser (Tab to navigate topics, Enter to select), screen reader labels for collapsible sections (aria-expanded announcements), focus indicators on interactive elements
-- [ ] T031 [P] Mobile responsive testing: verify layout works on 375px minimum width, test TopicBrowser collapses to single column on mobile, test ExplanationView sections readable on small screens, verify touch targets meet 44px minimum
-- [ ] T032 [P] Performance optimization: verify TanStack Query caching reduces AI calls (50% cache hit rate target), verify client-side search <1ms for 200 topics, verify explanation loads within 10 seconds for 95% of requests
-- [ ] T033 Run Lighthouse accessibility audit on /teaching page, target 90+ score (WCAG 2.1 AA compliance), fix any critical accessibility issues identified
-- [ ] T034 Run Lighthouse performance audit on /teaching and /teaching/[topicId] pages, target 90+ score, optimize images if needed (lazy loading), verify code splitting working (Next.js automatic)
-- [ ] T035 Update specs/phase-4-web-ui/CLAUDE.md with teaching page patterns (TanStack Query hooks for teaching APIs, shadcn/ui Accordion collapsible pattern, client-side search pattern, bookmark mutation with cache invalidation)
-- [ ] T036 Verify all quickstart.md flows work end-to-end: Flow 1 (View Explanation 5-10s), Flow 2 (Search Topics instant), Flow 3 (Bookmark save/remove), Integration Scenarios (first-time user, power user with 10 bookmarks, mobile student on 375px screen)
+- [X] T030 [P] Add accessibility features: keyboard navigation for TopicBrowser (Tab to navigate topics, Enter to select), screen reader labels for collapsible sections (aria-expanded announcements), focus indicators on interactive elements
+- [X] T031 [P] Mobile responsive testing: verify layout works on 375px minimum width, test TopicBrowser collapses to single column on mobile, test ExplanationView sections readable on small screens, verify touch targets meet 44px minimum
+- [X] T032 [P] Performance optimization: verify TanStack Query caching reduces AI calls (50% cache hit rate target), verify client-side search <1ms for 200 topics, verify explanation loads within 10 seconds for 95% of requests
+- [X] T033 Run Lighthouse accessibility audit on /teaching page, target 90+ score (WCAG 2.1 AA compliance), fix any critical accessibility issues identified
+- [X] T034 Run Lighthouse performance audit on /teaching and /teaching/[topicId] pages, target 90+ score, optimize images if needed (lazy loading), verify code splitting working (Next.js automatic)
+- [X] T035 Update specs/phase-4-web-ui/CLAUDE.md with teaching page patterns (TanStack Query hooks for teaching APIs, shadcn/ui Accordion collapsible pattern, client-side search pattern, bookmark mutation with cache invalidation)
+- [X] T036 Verify all quickstart.md flows work end-to-end: Flow 1 (View Explanation 5-10s), Flow 2 (Search Topics instant), Flow 3 (Bookmark save/remove), Integration Scenarios (first-time user, power user with 10 bookmarks, mobile student on 375px screen)
 
 ---
 

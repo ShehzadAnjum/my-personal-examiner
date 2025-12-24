@@ -1,3 +1,8 @@
+---
+name: port-management
+description: Port management and conflict resolution for development servers. Use when managing local development ports, resolving port conflicts, or starting multiple services.
+---
+
 # Skill: Port Management & Cleanup
 
 **Type**: Development Tools

@@ -1,3 +1,8 @@
+---
+name: pytest-testing-patterns
+description: pytest testing patterns for unit tests, mocks, fixtures, and SQLModel testing. Use when writing backend tests, test fixtures, or test utilities.
+---
+
 # Skill: Pytest Testing Patterns
 
 **Type**: Testing Infrastructure

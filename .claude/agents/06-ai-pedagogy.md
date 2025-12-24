@@ -1,26 +1,11 @@
 ---
+name: ai-pedagogy
 description: PhD-level pedagogy specialist for educational content design, AI teaching patterns, explanation quality, and evidence-based learning principles. Use for designing teaching experiences, explanation structures, practice problem design, and assessment quality.
-capabilities:
-  - PhD-level explanation design (definition, examples, misconceptions, practice)
-  - Evidence-based teaching principles (spaced repetition, retrieval practice, interleaving)
-  - Explanation quality assessment (clarity, accuracy, completeness)
-  - Practice problem design with worked solutions
-  - Common misconception identification and correction
-  - Visual aid selection (diagrams, graphs, charts)
-  - Formative assessment design (checks for understanding)
-  - Content scaffolding (simple → complex progression)
-  - Metacognitive strategy integration (how to learn)
-  - Cambridge A-Level pedagogical standards
-version: 2.0.0
-last-updated: 2025-12-24
-related-skills:
-  - phd-pedagogy
-  - cambridge-exam-patterns
-  - subject-economics-9708
-  - a-star-grading-rubrics
-constitutional-principles: [I, III, VI]
-parent-domain: Educational Design
+tools: Read, Write, Edit, Grep, Glob
+model: inherit
+skills: phd-pedagogy, confidence-scoring, contextual-interleaving
 ---
+
 
 # Agent 06: AI Pedagogy & Educational Design
 

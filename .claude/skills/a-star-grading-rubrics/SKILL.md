@@ -1,3 +1,8 @@
+---
+name: a-star-grading-rubrics
+description: A* grading rubrics and Cambridge marking criteria for Economics 9708. Use when implementing marking algorithms, grading logic, or evaluating answer quality.
+---
+
 # Skill: A* Grading Rubrics (Cambridge A-Level)
 
 **Domain**: Assessment & Grading Standards

@@ -1,3 +1,8 @@
+---
+name: bcrypt-password-hashing
+description: bcrypt password hashing and verification patterns for secure authentication. Use when implementing password authentication, user registration, or login systems.
+---
+
 # Skill: bcrypt Password Hashing
 
 **Type**: Security Expertise

@@ -1,3 +1,8 @@
+---
+name: subject-economics-9708
+description: Cambridge Economics 9708 syllabus content, topics, and learning objectives. Use when working with Economics concepts, syllabus validation, or content alignment.
+---
+
 # Skill: Cambridge A-Level Economics 9708
 
 **Domain**: Economics Subject Matter Expertise

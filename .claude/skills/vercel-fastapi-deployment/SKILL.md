@@ -1,3 +1,8 @@
+---
+name: vercel-fastapi-deployment
+description: Vercel deployment patterns for FastAPI backend and Next.js frontend. Use when deploying to Vercel, configuring environment variables, or setting up CI/CD.
+---
+
 # Skill: Vercel FastAPI Deployment
 
 **Type**: Deployment Expertise

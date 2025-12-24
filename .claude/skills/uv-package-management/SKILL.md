@@ -1,3 +1,8 @@
+---
+name: uv-package-management
+description: UV package manager commands for Python dependency management. Use when managing Python dependencies, installing packages, or configuring project environments.
+---
+
 # Skill: UV Package Management
 
 **Type**: Development Tools

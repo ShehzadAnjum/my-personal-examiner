@@ -1,3 +1,8 @@
+---
+name: contextual-interleaving
+description: Contextual interleaving algorithms for spaced repetition and practice problem sequencing. Use when implementing study plans, practice scheduling, or adaptive review systems.
+---
+
 # Skill: Contextual Interleaving
 
 **Domain**: Learning Science & Study Strategies

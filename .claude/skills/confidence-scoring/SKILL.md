@@ -1,3 +1,8 @@
+---
+name: confidence-scoring
+description: Confidence scoring algorithms for answer evaluation and knowledge gap detection. Use when implementing answer confidence metrics, knowledge assessment, or adaptive learning.
+---
+
 # Skill: Confidence Scoring for AI Marking
 
 **Domain**: AI Quality Assurance & Uncertainty Quantification

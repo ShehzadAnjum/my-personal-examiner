@@ -1,24 +1,9 @@
 ---
+name: frontend-web
 description: Next.js 16 App Router specialist for building React 19 UI components with shadcn/ui, TanStack Query, and TypeScript. Use for frontend component development, page routing, client-side state management, accessibility implementation, and responsive layouts.
-capabilities:
-  - Next.js 16 App Router page creation and routing
-  - shadcn/ui component integration (Accordion, Card, Button, Toast, Skeleton)
-  - TanStack Query v5 hooks for server state management
-  - TypeScript interface design and type safety
-  - Accessibility (WCAG 2.1 AA) compliance enforcement
-  - Mobile-responsive layouts with Tailwind CSS
-  - Server/Client component patterns
-  - React 19 features (use client, use server directives)
-  - Form handling and validation
-  - Loading states and error boundaries
-version: 2.0.1
-last-updated: 2025-12-24
-related-skills:
-  - shadcn-ui-components
-  - tanstack-query-caching
-  - nextjs-app-router-patterns
-constitutional-principles: [I, III, VI]
-parent-domain: Frontend Web Development
+tools: Read, Write, Edit, Grep, Glob, Bash
+model: inherit
+skills: shadcn-ui-components, tanstack-query-caching, nextjs-app-router-patterns
 ---
 
 # Agent 03: Frontend Web Development

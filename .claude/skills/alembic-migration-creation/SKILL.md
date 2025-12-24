@@ -1,3 +1,8 @@
+---
+name: alembic-migration-creation
+description: Alembic database migration creation and management for SQLModel/PostgreSQL. Use when creating database migrations, modifying schemas, or managing database versions.
+---
+
 # Skill: Alembic Migration Creation
 
 **Type**: Database Management

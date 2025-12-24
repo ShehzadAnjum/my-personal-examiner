@@ -331,3 +331,134 @@ export function SavedExplanationsList() {
 **Benefits/Insights:**
 [Why this matters]
 ```
+
+---
+
+## 2025-12-25 | Agent/Skill Format Fix - Claude Code Official Format Compliance
+
+### Official Agent/Skill Format Requirements
+
+**What we learned:**
+Claude Code has strict requirements for agent and skill file structure and frontmatter. Custom frontmatter fields prevent agents/skills from appearing in `/agents` and `/skills` catalogs.
+
+**Problem identified:**
+- Created 17 agents and 21 skills but they didn't appear in Claude Code's built-in lists
+- `/agents` and `/skills` commands returned nothing
+- Agents/skills were unusable because Claude Code couldn't recognize them
+
+**Root cause:**
+1. **Agents**: Used custom frontmatter fields (`capabilities`, `version`, `last-updated`, `related-skills`, `constitutional-principles`, `parent-domain`) instead of official fields
+2. **Skills**: Mixed formats - some in directories, some as .md files; used custom frontmatter fields
+
+**Where it was fixed:**
+- All 17 agent files in `.claude/agents/*.md`
+- All 21 skill directories in `.claude/skills/*/SKILL.md`
+
+**Should update:**
+- CREATE NEW: `.claude/skills/claude-code-compliance/SKILL.md` documenting these requirements
+
+**Official format requirements:**
+
+```yaml
+# AGENTS (.claude/agents/agent-name.md)
+---
+name: agent-name                    # REQUIRED: lowercase, hyphens only
+description: When to use this agent # REQUIRED: clear trigger description
+tools: Read, Write, Edit, Bash      # Optional: comma-separated list
+model: sonnet | opus | haiku | inherit  # Optional
+skills: skill1, skill2              # Optional: auto-load skills
+---
+
+# SKILLS (.claude/skills/skill-name/SKILL.md)
+---
+name: skill-name                    # REQUIRED: lowercase, hyphens, numbers
+description: What it does and when  # REQUIRED: MUST include WHEN to use
+allowed-tools: Read, Grep, Glob     # Optional: restrict tool access
+---
+```
+
+**Migration steps executed:**
+
+1. **Agents** (17 files fixed):
+   - Added `name` field (extracted from filename)
+   - Kept `description` (already correct)
+   - Added `tools` field (inferred from domain)
+   - Added `model: inherit` (default to parent model)
+   - Converted `related-skills` → `skills` (comma-separated)
+   - **Removed** all custom fields: `capabilities`, `version`, `last-updated`, `constitutional-principles`, `parent-domain`
+
+2. **Skills** (21 skills migrated):
+   - **6 directory-based skills**: Fixed frontmatter only
+   - **14 file-based skills**: Migrated `.md` files → `directory/SKILL.md`
+   - **1 empty test.md**: Deleted
+   - Added `name` field (extracted from filename)
+   - Added `description` with WHEN to use (critical for auto-invocation)
+   - **Removed** all custom fields: `skill-name`, `type`, `domain`, `parent-agent`, `version`, `constitutional-principles`, `capabilities`
+
+**Key insights:**
+
+1. **`name` field is REQUIRED** - Claude Code uses this for catalog indexing
+2. **`description` must include WHEN to use** - Claude uses this for auto-invocation matching
+3. **Skills must be in directories** - `.claude/skills/skill-name/SKILL.md` (uppercase SKILL.md)
+4. **No custom frontmatter allowed** - Only official fields are recognized
+5. **File naming conventions matter** - Lowercase, hyphens for names
+
+**Benefits:**
+
+- ✅ All agents now appear in `/agents` list
+- ✅ All skills now appear in `/skills` list
+- ✅ Claude can auto-invoke agents based on task context
+- ✅ Skills can be auto-loaded when relevant
+- ✅ Consistent format across all reusable intelligence
+- ✅ Compliance with official Claude Code standards
+
+**Documentation references:**
+
+- Agents: https://code.claude.com/docs/en/sub-agents.md
+- Skills: https://code.claude.com/docs/en/skills.md
+
+**Template for future agents:**
+
+```markdown
+---
+name: my-agent
+description: Expert in X. Use when working with Y or when user mentions Z.
+tools: Read, Write, Edit, Grep, Glob, Bash
+model: inherit
+skills: related-skill-1, related-skill-2
+---
+
+# Agent Name
+
+Your system prompt content here...
+```
+
+**Template for future skills:**
+
+```markdown
+---
+name: my-skill
+description: Patterns for X. Use when implementing Y or working with Z feature.
+---
+
+# Skill: My Skill Name
+
+## When to Use
+[Context where this applies]
+
+## Pattern
+[Code examples and guidance]
+
+## Common Pitfalls
+[What to avoid]
+```
+
+**Prevention strategy:**
+
+1. Always check official Claude Code docs before creating agents/skills
+2. Use templates above for new agents/skills
+3. Validate frontmatter with official spec before committing
+4. Test that agent/skill appears in catalog after creation
+5. Document only official fields in PROCESS_CHECKLIST.md
+
+---

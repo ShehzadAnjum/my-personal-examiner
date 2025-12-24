@@ -1,3 +1,10 @@
+---
+name: deployment
+description: Infrastructure deployment specialist. Handles Vercel deployments, environment configuration, CI/CD pipelines, and production monitoring. Use for deployment tasks and infrastructure management.
+tools: Read, Bash, Grep, Glob
+model: inherit
+---
+
 # Agent 09: Deployment
 
 **Domain**: Infrastructure Deployment

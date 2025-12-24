@@ -1,26 +1,8 @@
 ---
 name: shadcn-ui-components
-description: Use shadcn/ui React components (Accordion, Card, Button, Toast, Skeleton) with Tailwind CSS and accessibility built-in. Use when building collapsible sections, content cards, interactive buttons, notifications, or loading placeholders.
-allowed-tools: Read, Write, Edit
-version: 1.0.0
-last-updated: 2025-12-24
-parent-agent: frontend-web
-constitutional-principles: [III, VI]
-tags:
-  - shadcn/ui
-  - React components
-  - Tailwind CSS
-  - Accessibility
-  - WCAG 2.1 AA
-triggers:
-  - "Accordion"
-  - "collapsible section"
-  - "Card component"
-  - "Button"
-  - "Toast notification"
-  - "Skeleton loader"
-  - "shadcn/ui"
+description: shadcn/ui component integration patterns for Accordion, Card, Button, Toast, Skeleton, and other UI components. Use when building frontend interfaces with shadcn/ui library.
 ---
+
 
 # Skill: shadcn/ui Component Library Integration
 
