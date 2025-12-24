@@ -131,7 +131,7 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
           toast({
             title: 'Failed to Send Message',
             description: error instanceof Error ? error.message : 'Please try again.',
-            variant: 'error',
+            variant: 'destructive',
             duration: 5000,
           });
         }
