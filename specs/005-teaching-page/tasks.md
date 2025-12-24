@@ -100,10 +100,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create SavedExplanationsList component in frontend/components/teaching/SavedExplanationsList.tsx (props: savedExplanations from useSavedExplanations hook, renders TopicCard grid with showRemoveButton true, onRemove calls removeBookmark mutation)
-- [ ] T027 [US3] Create saved explanations page route in frontend/app/(dashboard)/teaching/saved/page.tsx (uses useSavedExplanations hook, displays SavedExplanationsList, shows empty state if no bookmarks, displays loading skeleton while fetching)
-- [ ] T028 [US3] Integrate useBookmark mutation in BookmarkButton component (already created in T014, verify saveExplanation mutation works, verify cache invalidation on save/remove, verify toast notifications for success/error, verify button state updates immediately)
-- [ ] T029 [US3] Test bookmark flow end-to-end: view explanation "3.1.2 PED", click Bookmark, verify POST /api/teaching/explanations succeeds, verify toast shows "Explanation saved", navigate to /teaching/saved, verify PED appears in saved list, click PED to view explanation (cached or re-fetched), click Remove to unbookmark, verify DELETE endpoint called and topic removed from saved list
+- [X] T026 [P] [US3] Create SavedExplanationsList component in frontend/components/teaching/SavedExplanationsList.tsx (props: savedExplanations from useSavedExplanations hook, renders TopicCard grid with showRemoveButton true, onRemove calls removeBookmark mutation)
+- [X] T027 [US3] Create saved explanations page route in frontend/app/(dashboard)/teaching/saved/page.tsx (uses useSavedExplanations hook, displays SavedExplanationsList, shows empty state if no bookmarks, displays loading skeleton while fetching)
+- [X] T028 [US3] Integrate useBookmark mutation in BookmarkButton component (already created in T014, verify saveExplanation mutation works, verify cache invalidation on save/remove, verify toast notifications for success/error, verify button state updates immediately)
+- [X] T029 [US3] Test bookmark flow end-to-end: view explanation "3.1.2 PED", click Bookmark, verify POST /api/teaching/explanations succeeds, verify toast shows "Explanation saved", navigate to /teaching/saved, verify PED appears in saved list, click PED to view explanation (cached or re-fetched), click Remove to unbookmark, verify DELETE endpoint called and topic removed from saved list
 
 **Checkpoint**: All 3 user stories should now be independently functional - students can browse topics, view explanations, and bookmark favorites
 

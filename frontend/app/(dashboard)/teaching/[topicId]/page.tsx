@@ -26,6 +26,8 @@ import { ExplanationView } from '@/components/teaching/ExplanationView';
 import { ExplanationLoadingState } from '@/components/teaching/ExplanationLoadingState';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useToggleBookmark } from '@/lib/hooks/useBookmark';
+import { useToast } from '@/lib/hooks/use-toast';
 import * as teachingApi from '@/lib/api/teaching';
 import type { TopicExplanation } from '@/lib/types/teaching';
 
@@ -44,6 +46,7 @@ export default function ExplanationPage() {
   const params = useParams();
   const router = useRouter();
   const topicId = params.topicId as string;
+  const { toast } = useToast();
 
   // State for fetching
   const [isLoading, setIsLoading] = useState(false);
@@ -59,10 +62,8 @@ export default function ExplanationPage() {
   const [showExplainMenu, setShowExplainMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
-  // State for bookmark
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isBookmarkPending, setIsBookmarkPending] = useState(false);
-  const [savedExplanationId, setSavedExplanationId] = useState<string | null>(null);
+  // TanStack Query bookmark hook (replaces manual state management)
+  const { toggle: toggleBookmark, isPending: isBookmarkPending, isBookmarked } = useToggleBookmark(topicId);
 
   // Load cached explanation from localStorage
   const loadCachedExplanation = (conceptId: string): CachedExplanation | null => {
@@ -156,73 +157,30 @@ export default function ExplanationPage() {
     }
   };
 
-  // Check bookmark status with localStorage caching for performance
-  const checkBookmarkStatus = async () => {
-    try {
-      // Check localStorage cache first for instant feedback
-      const cachedBookmarks = localStorage.getItem('saved_explanations_cache');
-      const cacheTimestamp = localStorage.getItem('saved_explanations_timestamp');
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-      if (cachedBookmarks && cacheTimestamp) {
-        const age = Date.now() - parseInt(cacheTimestamp);
-        if (age < CACHE_DURATION) {
-          const cached = JSON.parse(cachedBookmarks);
-          const savedExp = cached.find((exp: any) => exp.syllabus_point_id === topicId);
-          if (savedExp) {
-            setIsBookmarked(true);
-            setSavedExplanationId(savedExp.id);
-          } else {
-            setIsBookmarked(false);
-            setSavedExplanationId(null);
-          }
-          return; // Use cache, skip API call
-        }
-      }
-
-      // Cache miss or expired - fetch from API
-      const saved = await teachingApi.getSavedExplanations();
-
-      // Update cache
-      localStorage.setItem('saved_explanations_cache', JSON.stringify(saved));
-      localStorage.setItem('saved_explanations_timestamp', Date.now().toString());
-
-      const savedExp = saved.find(exp => exp.syllabus_point_id === topicId);
-      if (savedExp) {
-        setIsBookmarked(true);
-        setSavedExplanationId(savedExp.id);
-      } else {
-        setIsBookmarked(false);
-        setSavedExplanationId(null);
-      }
-    } catch (err) {
-      console.error('Failed to check bookmark status:', err);
+  // Handle bookmark toggle with toast notifications
+  const handleBookmarkToggle = () => {
+    if (!displayedExplanation) {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot bookmark',
+        description: 'Explanation not loaded yet',
+      });
+      return;
     }
-  };
 
-  // Toggle bookmark with cache invalidation (pointer-based)
-  const toggleBookmark = async () => {
-    setIsBookmarkPending(true);
-    try {
-      if (isBookmarked && savedExplanationId) {
-        // Remove bookmark
-        await teachingApi.removeSavedExplanation(savedExplanationId);
-        setIsBookmarked(false);
-        setSavedExplanationId(null);
-      } else {
-        // Add bookmark (pointer-based - no content sent)
-        const saved = await teachingApi.saveExplanation(topicId);
-        setIsBookmarked(true);
-        setSavedExplanationId(saved.id);
-      }
+    toggleBookmark(displayedExplanation);
 
-      // Invalidate cache so next check fetches fresh data
-      localStorage.removeItem('saved_explanations_cache');
-      localStorage.removeItem('saved_explanations_timestamp');
-    } catch (err) {
-      console.error('Failed to toggle bookmark:', err);
-    } finally {
-      setIsBookmarkPending(false);
+    // Show toast notification (optimistic - shows immediately)
+    if (isBookmarked) {
+      toast({
+        title: 'Bookmark removed',
+        description: `"${displayedExplanation.concept_name}" removed from saved explanations`,
+      });
+    } else {
+      toast({
+        title: 'Explanation saved',
+        description: `"${displayedExplanation.concept_name}" added to saved explanations`,
+      });
     }
   };
 
@@ -254,7 +212,6 @@ export default function ExplanationPage() {
   // Initialize: Load from cache and fetch if needed
   useEffect(() => {
     fetchExplanation();
-    checkBookmarkStatus();
   }, [topicId]);
 
   // Add document-level text selection handler to work everywhere
@@ -462,7 +419,7 @@ export default function ExplanationPage() {
         <ExplanationView
           explanation={displayedExplanation}
           isBookmarked={isBookmarked}
-          onBookmarkToggle={toggleBookmark}
+          onBookmarkToggle={handleBookmarkToggle}
           isLoading={isBookmarkPending}
         />
       )}
