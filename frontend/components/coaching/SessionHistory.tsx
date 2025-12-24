@@ -60,7 +60,7 @@ export function SessionHistory() {
   // Apply filters
   const filteredSessions = sessions.filter((session) => {
     if (outcomeFilter === 'all') return true;
-    return session.outcome === outcomeFilter;
+    return session.status === outcomeFilter;
   });
 
   // Apply sorting
@@ -227,7 +227,7 @@ export function SessionHistory() {
             id={session.id}
             topic={session.topic}
             createdAt={session.created_at}
-            outcome={session.outcome as any}
+            outcome={session.status}
             messageCount={session.message_count}
           />
         ))}
