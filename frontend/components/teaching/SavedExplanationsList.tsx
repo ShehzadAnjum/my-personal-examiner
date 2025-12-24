@@ -87,7 +87,7 @@ export function SavedExplanationsList() {
    * Runs whenever savedExplanations changes (after TanStack Query fetch)
    */
   useEffect(() => {
-    const enriched: SavedExplanationWithContent[] = savedExplanations.map((bookmark) => {
+    const enriched: SavedExplanationWithContent[] = savedExplanations.map((bookmark: SavedExplanation) => {
       const cachedExplanation = loadExplanationFromCache(bookmark.syllabus_point_id);
       return {
         ...bookmark,

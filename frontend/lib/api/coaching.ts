@@ -19,7 +19,8 @@ import type {
   GetSessionResponse,
   ListSessionsResponse,
   PendingMessage,
-  APIError
+  APIError,
+  Message
 } from '@/types/coaching';
 
 // ============================================================================

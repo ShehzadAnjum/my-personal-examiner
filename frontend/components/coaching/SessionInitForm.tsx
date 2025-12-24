@@ -85,7 +85,6 @@ export function SessionInitForm({ onSuccess }: SessionInitFormProps) {
           toast({
             title: 'Coaching Session Started',
             description: 'Your AI coach is ready to help you!',
-            variant: 'success',
             duration: 3000,
           });
           onSuccess(data.session_id, data.coach_message);
@@ -95,7 +94,7 @@ export function SessionInitForm({ onSuccess }: SessionInitFormProps) {
           toast({
             title: 'Failed to Start Session',
             description: error instanceof Error ? error.message : 'Please try again.',
-            variant: 'error',
+            variant: 'destructive',
             duration: 5000,
           });
         }

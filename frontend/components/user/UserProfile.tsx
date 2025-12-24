@@ -27,8 +27,8 @@ export function UserProfile() {
 
       if (session?.data?.user) {
         const userData = session.data.user;
-        // Extract image from various possible locations
-        const userImage = userData.image || userData.picture || undefined;
+        // Extract image from user data (Better Auth uses 'image' field)
+        const userImage = userData.image || undefined;
 
         console.log('📸 User image found:', userImage);
 
