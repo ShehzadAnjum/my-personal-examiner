@@ -19,7 +19,7 @@ from src.database import get_session
 from src.main import app
 
 
-@pytest.fixture(name="engine")
+@pytest.fixture(name="engine", scope="function")
 def engine_fixture():
     """
     Create in-memory SQLite engine for testing
@@ -37,13 +37,23 @@ def engine_fixture():
         poolclass=StaticPool,  # Single connection for in-memory DB
     )
 
-    # Create all tables
-    SQLModel.metadata.create_all(engine)
+    # Create all tables with checkfirst=True to avoid "already exists" errors
+    # This is needed because some tests reimport models multiple times
+    try:
+        SQLModel.metadata.create_all(engine, checkfirst=True)
+    except Exception:
+        # If creation fails, clear metadata and try again
+        SQLModel.metadata.clear()
+        SQLModel.metadata.create_all(engine, checkfirst=True)
 
     yield engine
 
-    # Drop all tables after test
-    SQLModel.metadata.drop_all(engine)
+    # Clean up after test
+    try:
+        SQLModel.metadata.drop_all(engine)
+    except Exception:
+        pass  # Ignore drop errors
+    engine.dispose()
 
 
 @pytest.fixture(name="session")

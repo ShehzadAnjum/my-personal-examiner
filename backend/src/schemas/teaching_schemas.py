@@ -435,3 +435,47 @@ class TopicExplanation(BaseModel):
             }
         }
     }
+
+
+class SaveExplanationRequest(BaseModel):
+    """
+    Request to save/bookmark a syllabus topic (pointer-based).
+
+    Used for POST /api/teaching/explanations endpoint.
+
+    Architecture: Pointer-based bookmarks
+    - Stores ONLY reference to syllabus_point_id (no content duplication)
+    - Explanation content cached in browser localStorage
+    - Simple favorite/bookmark system
+
+    Attributes:
+        syllabus_point_id: UUID of syllabus point to bookmark
+        student_id: UUID of student (from JWT in production)
+
+    Examples:
+        >>> request = SaveExplanationRequest(
+        ...     syllabus_point_id=UUID("550e8400-e29b-41d4-a716-446655440000"),
+        ...     student_id=UUID("660e8400-e29b-41d4-a716-446655440001"),
+        ... )
+    """
+
+    syllabus_point_id: UUID = Field(
+        ...,
+        description="UUID of syllabus point to bookmark (pointer only, no content)",
+        examples=["550e8400-e29b-41d4-a716-446655440000"],
+    )
+
+    student_id: UUID = Field(
+        ...,
+        description="UUID of student (from JWT in production)",
+        examples=["660e8400-e29b-41d4-a716-446655440001"],
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "syllabus_point_id": "550e8400-e29b-41d4-a716-446655440000",
+                "student_id": "660e8400-e29b-41d4-a716-446655440001",
+            }
+        }
+    }

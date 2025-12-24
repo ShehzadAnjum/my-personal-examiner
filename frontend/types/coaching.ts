@@ -245,7 +245,7 @@ export const VALIDATION_RULES = {
   topic: {
     minLength: 10,
     maxLength: 500,
-    pattern: /^[a-zA-Z0-9\s.,!?'-]+$/,
+    pattern: /^[a-zA-Z0-9\s.,!?'"\-:;()\[\]]+$/,
     errorMessage: 'Please describe your struggle in 10-500 characters'
   },
   messageContent: {

@@ -178,6 +178,54 @@ Provide a comprehensive, PhD-level explanation of "{concept_name}" that enables 
   }}
 }}
 
+**IMPORTANT - MERMAID DIAGRAM EXAMPLES**:
+
+For ECONOMIC GRAPHS (supply/demand, cost curves, etc.), use Mermaid XY charts:
+
+Example 1 - Supply and Demand Curves:
+```
+---
+config:
+  xyChart:
+    width: 600
+    height: 400
+  themeVariables:
+    xyChart:
+      backgroundColor: "transparent"
+---
+xychart-beta
+    title "Supply and Demand"
+    x-axis "Quantity" 0 --> 100
+    y-axis "Price ($)" 0 --> 50
+    line "Demand" [45, 40, 35, 30, 25, 20, 15, 10, 5]
+    line "Supply" [5, 10, 15, 20, 25, 30, 35, 40, 45]
+```
+
+Example 2 - Production Possibility Frontier:
+```
+xychart-beta
+    title "Production Possibility Frontier"
+    x-axis "Goods A" 0 --> 100
+    y-axis "Goods B" 0 --> 100
+    line "PPF" [100, 90, 75, 55, 30, 0]
+```
+
+For FLOWCHARTS/DIAGRAMS (decision trees, market structures), use graph syntax:
+```
+graph LR
+    A[Perfect Competition] --> B{{Many Firms?}}
+    B -->|Yes| C[Price Taker]
+    B -->|No| D[Monopoly/Oligopoly]
+    C --> E[Allocative Efficiency]
+```
+
+CRITICAL RULES:
+- For XY charts: Use "xychart-beta" and provide data arrays
+- For supply curves: Use ASCENDING data (e.g., [5, 10, 15, 20, 25])
+- For demand curves: Use DESCENDING data (e.g., [45, 40, 35, 30, 25])
+- Always include x-axis and y-axis labels with ranges
+- Keep data arrays consistent in length (recommended: 9 data points)
+
 Explain NOW with PhD-level precision and clarity:"""
 
     @staticmethod

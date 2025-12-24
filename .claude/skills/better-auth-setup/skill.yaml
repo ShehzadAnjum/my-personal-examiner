@@ -1,0 +1,24 @@
+name: better-auth-setup
+description: Drop-in authentication setup for Next.js projects using Better-Auth
+version: 1.0.0
+author: Anjum
+created: 2025-12-24
+last_updated: 2025-12-24
+reference_project: ~/dev/evolution_to_do
+tags:
+  - authentication
+  - better-auth
+  - nextjs
+  - postgresql
+  - neon
+  - oauth
+  - google-auth
+dependencies:
+  - better-auth
+  - "@neondatabase/serverless"
+  - kysely
+  - zod
+tested: true
+working: true
+time_to_setup: 5 minutes
+complexity: low

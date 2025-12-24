@@ -1,3 +1,10 @@
+---
+name: reviewer
+description: Code review and quality specialist. Reviews code changes, enforces coding standards, validates constitutional compliance, suggests improvements. Use for code review and quality validation.
+tools: Read, Grep, Glob, LSP
+model: inherit
+---
+
 # Agent 12: Reviewer
 
 **Domain**: Improvement Analysis & A* Model Answers

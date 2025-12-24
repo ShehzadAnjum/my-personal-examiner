@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application metadata
@@ -28,13 +28,35 @@ app = FastAPI(
 )
 
 # CORS middleware (Phase IV - Frontend integration)
+# IMPORTANT: Must be added BEFORE any routes to intercept OPTIONS preflight
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Next.js frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+
+# Global OPTIONS handler for CORS preflight (fallback)
+@app.middleware("http")
+async def catch_options_requests(request: Request, call_next):
+    """
+    Middleware to handle OPTIONS requests globally
+    Ensures all OPTIONS preflight requests return 200 OK
+    """
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "http://localhost:3000",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "true",
+            },
+        )
+    return await call_next(request)
 
 
 # Health check endpoint
@@ -88,6 +110,7 @@ async def shutdown_event() -> None:
 # Router registration
 # Phase 3 (US1): Authentication (register)
 from src.routes import auth
+from src.routes import auth_extra  # Better-auth integration endpoints
 from src.routes import coaching  # Phase III US2: Coach Agent
 from src.routes import exams
 from src.routes import feedback  # Phase III US5: Reviewer Agent
@@ -99,6 +122,7 @@ from src.routes import syllabus
 from src.routes import teaching  # Phase III US1: Teacher Agent
 
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
+app.include_router(auth_extra.router, tags=["auth-extra"])  # Better-auth student lookup
 app.include_router(questions.router, tags=["questions"])  # Phase II US1: Upload & Storage
 app.include_router(exams.router, tags=["exams"])  # Phase II US6: Exam Generation
 app.include_router(syllabus.router, tags=["syllabus"])  # Phase II US7: Syllabus Tagging

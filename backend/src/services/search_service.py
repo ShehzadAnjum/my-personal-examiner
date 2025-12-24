@@ -184,8 +184,29 @@ class SearchService:
         has_next = page < total_pages
         has_prev = page > 1
 
+        # Convert questions to dict manually to avoid .dict() issues
+        questions_data = []
+        for q in questions:
+            questions_data.append({
+                "id": str(q.id),
+                "subject_id": str(q.subject_id),
+                "question_text": q.question_text,
+                "max_marks": q.max_marks,
+                "difficulty": q.difficulty,
+                "source_paper": q.source_paper,
+                "paper_number": q.paper_number,
+                "question_number": q.question_number,
+                "year": q.year,
+                "session": q.session,
+                "marking_scheme": q.marking_scheme,
+                "syllabus_point_ids": q.syllabus_point_ids,
+                "file_path": q.file_path,
+                "created_at": q.created_at.isoformat() if q.created_at else None,
+                "updated_at": q.updated_at.isoformat() if q.updated_at else None,
+            })
+
         return {
-            "questions": [q.model_dump() for q in questions],
+            "questions": questions_data,
             "total": total,
             "page": page,
             "page_size": page_size,
@@ -288,8 +309,25 @@ class SearchService:
         has_next = page < total_pages
         has_prev = page > 1
 
+        # Convert mark schemes to dict manually to avoid .dict() issues
+        mark_schemes_data = []
+        for ms in mark_schemes:
+            mark_schemes_data.append({
+                "id": str(ms.id),
+                "subject_id": str(ms.subject_id),
+                "source_paper": ms.source_paper,
+                "mark_scheme_text": ms.mark_scheme_text,
+                "question_paper_filename": ms.question_paper_filename,
+                "paper_number": ms.paper_number,
+                "year": ms.year,
+                "session": ms.session,
+                "file_path": ms.file_path,
+                "created_at": ms.created_at.isoformat() if ms.created_at else None,
+                "updated_at": ms.updated_at.isoformat() if ms.updated_at else None,
+            })
+
         return {
-            "mark_schemes": [ms.model_dump() for ms in mark_schemes],
+            "mark_schemes": mark_schemes_data,
             "total": total,
             "page": page,
             "page_size": page_size,
