@@ -165,7 +165,7 @@ async def explain_concept(
         response_text, provider = await llm_orchestrator.generate_with_fallback(
             prompt=prompt,
             temperature=0.3,  # Low temperature for accuracy
-            max_tokens=4000,  # Long explanation
+            max_tokens=4000,  # Comprehensive PhD-level explanation (max for GPT-4 Turbo fallback)
             system_prompt=TeacherPrompts.SYSTEM_PROMPT,
         )
 
@@ -212,16 +212,30 @@ async def explain_concept(
             for kt in key_terms_data
         ]
 
-        # Get explanation text
+        # Get explanation text - combine all three components
         explanation_data = response_data.get("explanation", {})
         if isinstance(explanation_data, dict):
-            explanation_text = explanation_data.get("core_principles", "")
+            # Combine all three fields from the structured explanation
+            core = explanation_data.get("core_principles", "")
+            why = explanation_data.get("why_it_matters", "")
+            theory = explanation_data.get("theoretical_foundation", "")
+
+            # Build comprehensive explanation text
+            parts = []
+            if core:
+                parts.append(f"**Core Principles**:\n{core}")
+            if why:
+                parts.append(f"\n\n**Why It Matters**:\n{why}")
+            if theory:
+                parts.append(f"\n\n**Theoretical Foundation**:\n{theory}")
+
+            explanation_text = "\n".join(parts) if parts else ""
         else:
             explanation_text = str(explanation_data)
 
         explanation = TopicExplanation(
             syllabus_code=syllabus_point.code,
-            concept_name=definition_str[:100] or syllabus_point.description[:50],
+            concept_name=syllabus_point.description.split(":")[0].strip() if ":" in syllabus_point.description else syllabus_point.description,
             definition=definition_str,
             key_terms=key_terms,
             explanation=explanation_text,

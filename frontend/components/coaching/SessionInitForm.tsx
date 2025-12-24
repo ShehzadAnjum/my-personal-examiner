@@ -14,13 +14,15 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStartSession } from '@/lib/api/coaching';
 import { validateTopic } from '@/lib/validation/coaching';
 import { SessionInitFormSkeleton } from './SessionInitFormSkeleton';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/lib/hooks/use-toast';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 interface SessionInitFormProps {
   onSuccess: (sessionId: string, firstMessage: string) => void;
@@ -32,6 +34,16 @@ export function SessionInitForm({ onSuccess }: SessionInitFormProps) {
 
   const { toast } = useToast();
   const startSessionMutation = useStartSession();
+
+  // Load initial text from sessionStorage (from teaching page text selection)
+  useEffect(() => {
+    const initialText = sessionStorage.getItem('coaching_initial_text');
+    if (initialText) {
+      setTopic(initialText);
+      // Clear it after loading
+      sessionStorage.removeItem('coaching_initial_text');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +124,14 @@ export function SessionInitForm({ onSuccess }: SessionInitFormProps) {
     <div className="max-w-2xl mx-auto p-6">
       <div className="space-y-4">
         <div>
+          <Link
+            href="/teaching"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-4"
+            aria-label="Back to teaching"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back to Teaching</span>
+          </Link>
           <h1 className="text-3xl font-bold">AI Coaching Session</h1>
           <p className="text-muted-foreground mt-2">
             Describe what you're struggling with, and I'll help you understand it.

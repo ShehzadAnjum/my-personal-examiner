@@ -19,6 +19,9 @@ Phase III Models:
 - CoachingSession: Tutor session transcripts (Coach Agent)
 - StudyPlan: Personalized study schedules (Planner Agent, SM-2 algorithm)
 - ImprovementPlan: Weakness analysis and action items (Reviewer Agent)
+
+Phase IV Models:
+- SavedExplanation: Bookmarked explanations (Teaching Page)
 """
 
 from src.models.attempt import Attempt
@@ -28,6 +31,7 @@ from src.models.exam import Exam
 from src.models.improvement_plan import ImprovementPlan
 from src.models.mark_scheme import MarkScheme
 from src.models.question import Question
+from src.models.saved_explanation import SavedExplanation
 from src.models.student import Student
 from src.models.study_plan import StudyPlan
 from src.models.subject import Subject
@@ -48,4 +52,6 @@ __all__ = [
     "CoachingSession",
     "StudyPlan",
     "ImprovementPlan",
+    # Phase IV
+    "SavedExplanation",
 ]

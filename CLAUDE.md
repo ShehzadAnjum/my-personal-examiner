@@ -148,13 +148,20 @@
 **Available Artifacts**:
 - **Agents** (`.claude/agents/`) - 10 long-lived domain owners
 - **Subagents** (`.claude/subagents/`) - 18+ narrow task specialists
-- **Skills** (`.claude/skills/`) - 13+ reusable knowledge blocks
+- **Skills** (`.claude/skills/`) - 21+ reusable knowledge blocks
 - **Commands** (`.claude/commands/`) - 11 SpecKit commands
+
+**Quick Access to Common Skills**:
+- **port-management.md** - Kill stuck ports (3000-3002, 8000), handle IPv4/IPv6
+- **uv-package-management.md** - Python dependency management
+- **multi-tenant-query-pattern.md** - Student-scoped database queries
+- **See all**: `.claude/skills/README.md`
 
 **Always Announce Usage**:
 ```
 📢 ANNOUNCING: Using Agent 02 - Backend Service
 📢 ANNOUNCING: Using Skill: fastapi-route-implementation
+📢 ANNOUNCING: Using Skill: port-management
 ```
 
 ---
@@ -230,6 +237,8 @@ my_personal_examiner/
 ## Active Technologies
 - TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+ (004-coaching-page)
 - Backend PostgreSQL (via API calls), browser localStorage for session persistence (004-coaching-page)
+- TypeScript 5.7+ (Next.js 16+, React 19) + Next.js 16 App Router, React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+, Lucide React (icons) (005-teaching-page)
+- PostgreSQL via REST API calls (backend already implemented) (005-teaching-page)
 
 ## Recent Changes
 - 004-coaching-page: Added TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+

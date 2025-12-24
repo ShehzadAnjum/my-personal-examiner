@@ -33,10 +33,12 @@ import { validateMessageContent } from '@/lib/validation/coaching';
 import { SessionOutcome } from './SessionOutcome';
 import { ErrorBoundary } from './ErrorBoundary';
 import { ChatInterfaceSkeleton } from './ChatInterfaceSkeleton';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/lib/hooks/use-toast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { trackEvent } from '@/lib/analytics';
 import type { Message as MessageType } from '@/types/coaching';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 interface ChatInterfaceProps {
   sessionId: string;
@@ -218,7 +220,8 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
 
   return (
     <div
-      className={`h-screen flex flex-col ${!isSessionActive ? 'ended' : ''}`}
+      className={`flex flex-col overflow-hidden ${!isSessionActive ? 'ended' : ''}`}
+      style={{ height: 'calc(100vh - 64px)', maxHeight: 'calc(100vh - 64px)' }}
       data-testid="chat-interface"
     >
       {/* Offline Banner */}
@@ -233,8 +236,20 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
       )}
 
       {/* Session Header */}
-      <div className="bg-card border-b p-4">
-        <h2 className="text-lg font-semibold">AI Coaching Session</h2>
+      <div className="bg-card border-b p-4 flex-shrink-0">
+        <div className="flex items-center gap-4 mb-2">
+          <Link
+            href="/teaching"
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            aria-label="Back to teaching"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Teaching</span>
+          </Link>
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">AI Coaching Session</h2>
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">
           Topic: {sessionData?.topic || 'Loading...'}
         </p>
@@ -247,8 +262,8 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
         )}
       </div>
 
-      {/* ChatScope Container */}
-      <div className="flex-1 relative">
+      {/* ChatScope Container - constrained height */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         <MainContainer>
           <ChatContainer>
             <MessageList
@@ -318,11 +333,36 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
           </ChatContainer>
         </MainContainer>
 
-        {/* Session Outcome - shown below chat when session ends */}
-        {outcomeType && onStartNewSession && (
-          <div className="px-4 py-4 border-t bg-gray-50">
-            <ErrorBoundary componentName="SessionOutcome">
-              <SessionOutcome
+        {/* Validation Error */}
+        {validationError && (
+          <div className="bg-destructive text-destructive-foreground p-2 text-sm border-t">
+            {validationError}
+          </div>
+        )}
+
+        {/* Send Error */}
+        {sendMessageMutation.error && (
+          <div
+            className="bg-destructive text-destructive-foreground p-2 text-sm flex items-center justify-between border-t"
+            data-testid="message-error"
+          >
+            <span>Failed to send message</span>
+            <button
+              onClick={() => sendMessageMutation.reset()}
+              className="text-xs underline"
+              data-testid="retry-message"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Session Outcome - shown below chat when session ends */}
+      {outcomeType && onStartNewSession && (
+        <div className="px-4 py-4 border-t bg-gray-50 flex-shrink-0">
+          <ErrorBoundary componentName="SessionOutcome">
+            <SessionOutcome
                 outcome={outcomeType}
                 summary={
                   outcomeType === 'resolved'
@@ -375,31 +415,6 @@ export function ChatInterface({ sessionId, initialMessage, onStartNewSession }: 
             </ErrorBoundary>
           </div>
         )}
-
-        {/* Validation Error */}
-        {validationError && (
-          <div className="absolute bottom-16 left-4 right-4 bg-destructive text-destructive-foreground p-2 rounded-md text-sm">
-            {validationError}
-          </div>
-        )}
-
-        {/* Send Error */}
-        {sendMessageMutation.error && (
-          <div
-            className="absolute bottom-16 left-4 right-4 bg-destructive text-destructive-foreground p-2 rounded-md text-sm flex items-center justify-between"
-            data-testid="message-error"
-          >
-            <span>Failed to send message</span>
-            <button
-              onClick={() => sendMessageMutation.reset()}
-              className="text-xs underline"
-              data-testid="retry-message"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-      </div>
 
       {/* Send Button (for E2E testing) */}
       <button
