@@ -57,10 +57,17 @@ export function SessionHistory() {
     }
   }, [isLoading, sessions.length, total]);
 
+  // Map backend 'active' status to frontend 'in_progress' for display
+  const mapStatusToOutcome = (status: string): 'resolved' | 'needs_more_help' | 'refer_to_teacher' | 'in_progress' | 'abandoned' => {
+    if (status === 'active') return 'in_progress';
+    return status as 'resolved' | 'needs_more_help' | 'refer_to_teacher' | 'in_progress' | 'abandoned';
+  };
+
   // Apply filters
   const filteredSessions = sessions.filter((session) => {
     if (outcomeFilter === 'all') return true;
-    return session.status === outcomeFilter;
+    const mappedStatus = mapStatusToOutcome(session.status);
+    return mappedStatus === outcomeFilter;
   });
 
   // Apply sorting
@@ -227,7 +234,7 @@ export function SessionHistory() {
             id={session.id}
             topic={session.topic}
             createdAt={session.created_at}
-            outcome={session.status}
+            outcome={mapStatusToOutcome(session.status)}
             messageCount={session.message_count}
           />
         ))}
