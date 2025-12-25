@@ -200,18 +200,18 @@ description: "Task list for Coaching Page - Interactive AI Tutoring implementati
 - [x] T062 [P] Add error boundaries for each major component (SessionInitForm, ChatInterface, SessionOutcome, SessionHistory) in respective files
 - [x] T063 [P] Implement skeleton loading states for all async operations (session creation, message sending, history loading)
 - [x] T064 [P] Add toast notifications for errors and success messages using shadcn/ui toast component
-- [ ] T065 Add mobile responsive design verification (test at 375x667, 1024x768, 1920x1080 from quickstart.md)
+- [ ] T065 Add mobile responsive design verification (test at 375x667, 1024x768, 1920x1080 from quickstart.md) → **See MANUAL_VERIFICATION.md**
 - [x] T066 [P] Optimize ChatInterface performance for 50+ message conversations (virtual scrolling with react-window or @tanstack/react-virtual)
 - [x] T067 [P] Add keyboard shortcuts (Ctrl+Enter to send message, Esc to close modals, etc.)
-- [ ] T068 Run accessibility audit with axe DevTools or Lighthouse (ensure WCAG 2.1 AA compliance)
+- [ ] T068 Run accessibility audit with axe DevTools or Lighthouse (ensure WCAG 2.1 AA compliance) → **See MANUAL_VERIFICATION.md**
 - [x] T069 [P] Add analytics tracking for coaching events (session start, message send, session end, outcome)
 - [x] T070 [P] Create Phase IV CLAUDE.md in specs/phase-4-web-ui/CLAUDE.md with frontend patterns and conventions
-- [ ] T071 Run security verification from quickstart.md (multi-tenant isolation test: Student B cannot access Student A's session)
+- [ ] T071 Run security verification from quickstart.md (multi-tenant isolation test: Student B cannot access Student A's session) → **See MANUAL_VERIFICATION.md**
 - [x] T072 [P] Add unit tests for utility functions (validation, date formatting, etc.) in frontend/lib/__tests__/
-- [ ] T073 Run performance benchmarks from quickstart.md (session creation <3s, message send <2s, coach response <10s p95)
-- [ ] T074 Create demo video showing complete coaching workflow (<90 seconds per constitution)
+- [ ] T073 Run performance benchmarks from quickstart.md (session creation <3s, message send <2s, coach response <10s p95) → **See MANUAL_VERIFICATION.md**
+- [ ] T074 Create demo video showing complete coaching workflow (<90 seconds per constitution) → **See MANUAL_VERIFICATION.md**
 - [x] T075 Update PROJECT_STATUS_REPORT.md with coaching page completion status
-- [ ] T076 Run quickstart.md manual testing checklist (all P1, P2, P3 scenarios)
+- [ ] T076 Run quickstart.md manual testing checklist (all P1, P2, P3 scenarios) → **See MANUAL_VERIFICATION.md**
 
 ---
 
