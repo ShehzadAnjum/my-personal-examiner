@@ -27,7 +27,7 @@ from sqlmodel import Session
 
 from src.database import get_session
 from src.models.student import Student
-from src.routes.auth_extra import get_current_student
+from src.routes.auth_extra import get_current_student, get_optional_student
 from src.schemas.academic_level_schemas import (
     AcademicLevelCreate,
     AcademicLevelDetail,
@@ -73,12 +73,13 @@ def require_admin(student: Student = Depends(get_current_student)) -> Student:
 @router.get("", response_model=list[AcademicLevelSummary])
 async def list_academic_levels(
     service: Annotated[HierarchyService, Depends(get_hierarchy_service)],
-    _: Annotated[Student, Depends(get_current_student)],
+    _: Annotated[Student | None, Depends(get_optional_student)],
 ) -> list[AcademicLevelSummary]:
     """
     List all academic levels.
 
     Returns academic levels with subject counts.
+    No authentication required - academic levels are global resources.
     """
     return service.list_academic_levels(include_counts=True)
 
@@ -108,7 +109,7 @@ async def create_academic_level(
 async def get_academic_level(
     level_id: UUID,
     service: Annotated[HierarchyService, Depends(get_hierarchy_service)],
-    _: Annotated[Student, Depends(get_current_student)],
+    _: Annotated[Student | None, Depends(get_optional_student)],
 ) -> AcademicLevelDetail:
     """
     Get an academic level by ID.
@@ -180,7 +181,7 @@ async def delete_academic_level(
 async def list_subjects_for_level(
     level_id: UUID,
     service: Annotated[HierarchyService, Depends(get_hierarchy_service)],
-    _: Annotated[Student, Depends(get_current_student)],
+    _: Annotated[Student | None, Depends(get_optional_student)],
 ) -> list[SubjectSummaryForLevel]:
     """
     List all subjects under an academic level.
@@ -244,7 +245,7 @@ hierarchy_router = APIRouter(tags=["Hierarchy"])
 @hierarchy_router.get("/hierarchy", response_model=HierarchyTree)
 async def get_hierarchy_tree(
     service: Annotated[HierarchyService, Depends(get_hierarchy_service)],
-    _: Annotated[Student, Depends(get_current_student)],
+    _: Annotated[Student | None, Depends(get_optional_student)],
 ) -> HierarchyTree:
     """
     Get the complete hierarchy tree.

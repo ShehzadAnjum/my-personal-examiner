@@ -24,28 +24,10 @@ async def get_current_student(
     session: Session = Depends(get_session),
 ) -> Student:
     """
-    Get current authenticated student by ID.
+    Get current authenticated student by ID (required).
 
-    This dependency should be used for student-authenticated endpoints.
-    It verifies the student exists.
-
-    Args:
-        student_id: UUID of the student making the request
-        session: Database session (injected)
-
-    Returns:
-        Student: The student entity
-
-    Raises:
-        HTTPException 404: Student not found
-
-    Example:
-        >>> @router.get("/api/resources/my-uploads")
-        >>> async def my_uploads(
-        >>>     current_student: Student = Depends(get_current_student),
-        >>>     session: Session = Depends(get_session),
-        >>> ):
-        >>>     return filter_resources_by_student(current_student.id)
+    This dependency should be used for student-scoped endpoints.
+    It requires student_id and verifies the student exists.
     """
     statement = select(Student).where(Student.id == student_id)
     student = session.exec(statement).first()
@@ -57,6 +39,32 @@ async def get_current_student(
         )
 
     return student
+
+
+async def get_optional_student(
+    student_id: UUID | None = Query(None, description="Student ID from session"),
+    session: Session = Depends(get_session),
+) -> Student | None:
+    """
+    Get current authenticated student by ID (optional).
+
+    Use this for global resources where authentication is optional.
+    Returns None if no student_id provided.
+
+    Args:
+        student_id: Optional UUID of the student
+        session: Database session (injected)
+
+    Returns:
+        Student | None: The student entity or None
+    """
+    if student_id is None:
+        return None
+
+    statement = select(Student).where(Student.id == student_id)
+    student = session.exec(statement).first()
+    return student
+
 
 
 # Routes

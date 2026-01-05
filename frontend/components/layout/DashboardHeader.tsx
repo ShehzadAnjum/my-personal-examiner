@@ -37,6 +37,9 @@ export function DashboardHeader() {
   const { data: syllabi } = useSyllabiForSubject(activeSubject?.id || null);
   const activeSyllabus = syllabi?.find((s) => s.is_active) || syllabi?.[0];
 
+  // Check if on admin page (don't show subject warning on admin pages)
+  const isAdminPage = pathname?.startsWith('/admin');
+
   // Listen for custom events from teaching page
   useEffect(() => {
     const handleTopicChange = (e: CustomEvent<{ code: string; name: string }>) => {
@@ -93,12 +96,12 @@ export function DashboardHeader() {
                     </>
                   )}
                 </p>
-              ) : (
+              ) : !isAdminPage ? (
                 <p className="text-xs text-amber-600 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
                   No subject configured
                 </p>
-              )}
+              ) : null}
             </div>
           </Link>
 
