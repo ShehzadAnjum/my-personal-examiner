@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: Resource Bank - Sync Management API
+  version: 1.0.0
+  description: Daily sync job and S3 upload queue management
+
+paths:
+  /api/sync/trigger:
+    post:
+      summary: Manually trigger Cambridge resource sync
+      tags: [Sync]
+      responses:
+        '202':
+          description: Sync job queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    format: uuid
+
+  /api/sync/status:
+    get:
+      summary: Get current sync job status
+      tags: [Sync]
+      responses:
+        '200':
+          description: Sync status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [idle, running, success, failed]
+                  last_sync_date:
+                    type: string
+                    format: date-time
+                  new_resources_count:
+                    type: integer
+
+  /api/sync/s3-status:
+    get:
+      summary: Get S3 upload queue status
+      tags: [Sync]
+      responses:
+        '200':
+          description: S3 queue status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pending_uploads:
+                    type: integer
+                  failed_uploads:
+                    type: integer
+                  s3_online:
+                    type: boolean
+
+  /api/sync/retry-s3:
+    post:
+      summary: Retry failed S3 uploads
+      tags: [Sync]
+      responses:
+        '202':
+          description: Retry batch queued

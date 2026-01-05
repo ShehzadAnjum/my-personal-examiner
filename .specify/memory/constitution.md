@@ -20,7 +20,7 @@ CHANGES MADE:
 6. Established SpecKit workflow integration
 7. Defined repository structure and hygiene rules
 
-PRINCIPLES (12 Non-Negotiable):
+PRINCIPLES (13 Non-Negotiable):
 1. Subject Accuracy is Non-Negotiable
 2. A* Standard Marking Always
 3. Syllabus Synchronization First
@@ -33,6 +33,7 @@ PRINCIPLES (12 Non-Negotiable):
 10. Official Skills Priority (NEW 2025-12-18)
 11. CLAUDE.md Hierarchy (NEW 2025-12-18)
 12. Project Management Professional (PMP) Agent (NEW 2025-12-23)
+13. Reusable Intelligence Announcement Mandatory (NEW 2025-12-27)
 
 SPECKIT WORKFLOW:
 Constitution → Spec → Clarify (optional) → Plan → Tasks → Implementation → Capstone
@@ -68,8 +69,8 @@ docs: create constitution v1.0.0 (8 principles + 5-phase workflow)
 # My Personal Examiner: Project Constitution
 
 **Created**: December 16, 2025
-**Version**: 3.0.0
-**Last Amended**: 2025-12-23
+**Version**: 3.1.0
+**Last Amended**: 2025-12-27
 **Project**: My Personal Examiner - PhD-Level A-Level Teaching & Examination System
 **Objective**: Create automated, personalized PhD-level teacher for Cambridge International A-Levels achieving A* grades
 
@@ -1018,6 +1019,119 @@ Without explicit state tracking, AI sessions lose context when:
 
 ---
 
+### Principle XIII: Reusable Intelligence Announcement Mandatory (NEW - 2025-12-27)
+
+**Rule**: ALL usage of agents, subagents, and skills MUST be announced using the standard announcement format. Post-resume hook MUST load RI inventory at every session start.
+
+**Mandatory Announcement Format**:
+```
+📢 ANNOUNCING: Using Agent [ID] - [Name]
+📢 ANNOUNCING: Using Subagent: [Name]
+📢 ANNOUNCING: Using Skill: [Name]
+```
+
+**Examples**:
+```
+📢 ANNOUNCING: Using Agent 02 - Backend Service
+📢 ANNOUNCING: Using Skill: fastapi-route-implementation
+📢 ANNOUNCING: Using Subagent: alembic-migration-writer
+```
+
+**What This Means**:
+- Every agent invocation MUST be announced before use
+- Every skill application MUST be announced before use
+- Every subagent call MUST be announced before use
+- Post-resume hook loads complete RI inventory (16 agents, 5 subagents, 22 skills)
+- Claude Code reads `.claude/hooks/post-resume.md` after context compaction
+
+**Why This Matters**:
+- **Transparency**: User knows which specialized knowledge is being applied
+- **Traceability**: Session logs show RI usage patterns for retrospectives
+- **Quality Assurance**: Confirms correct RI is being used for the task
+- **Knowledge Transfer**: Team learns which RI to use for similar tasks
+- **Context Preservation**: Post-resume hook ensures RI not forgotten after compaction
+- **Result**: Consistent RI usage, better debugging, improved onboarding
+
+**Enforcement**:
+- **Automated**:
+  - Post-resume hook (`.claude/hooks/post-resume.md`) loads RI inventory automatically
+  - Hook displays available agents/subagents/skills at session start
+  - Hook commits Claude to announcing RI usage throughout session
+- **Manual**:
+  - Code review checks for RI announcements in session logs
+  - PR description includes "RI Used: Agent 02, Skill: fastapi-route-implementation"
+  - Weekly audit: Verify RI announcements in recent commits
+- **AI**:
+  - Claude refuses to use RI without announcement
+  - Pre-work checklist includes "Will I announce RI usage?"
+  - Session summary includes RI usage statistics
+
+**Post-Resume Hook Protocol**:
+
+**Trigger**: After every conversation compaction, session resume, or new session start
+
+**Hook Execution** (`.claude/hooks/post-resume.md`):
+1. Load RI inventory (16 agents, 5 subagents, 22 skills)
+2. Display relevant RI for current task
+3. Commit to announcing RI usage with 📢 format
+4. Read session context files (SESSION_HANDOFF.md, PROJECT_STATE.md, spec.md)
+
+**Hook Output Example**:
+```
+🔄 POST-RESUME HOOK EXECUTED
+- Loaded 16 agents, 5 subagents, 22 skills
+- Constitutional RI announcement requirement acknowledged
+- Session context files read
+
+📋 RELEVANT RI FOR CURRENT TASK:
+- Agent 02: backend-service
+- Skills: sqlmodel-database-schema-design, multi-tenant-query-pattern
+- Subagent: alembic-migration-writer
+
+✅ COMMITMENT: I will announce every agent/subagent/skill usage with 📢 ANNOUNCING format
+```
+
+**Available Reusable Intelligence**:
+
+**Agents (16)**:
+- 00: project-management (session continuity, debugging branches)
+- 01: system-architect (architecture validation, ADRs)
+- 02: backend-service (FastAPI, SQLModel, PostgreSQL)
+- 03: frontend-web (Next.js, React, shadcn/ui)
+- 04: assessment-engine (question generation, exams)
+- 05: syllabus-research (Cambridge sync, resources)
+- 06: ai-pedagogy (educational content, PhD-level teaching)
+- 07: testing-quality (pytest, Playwright, accessibility)
+- 08: docs-demo, teacher (documentation, teaching)
+- 09: coach, deployment (coaching, Vercel deploy)
+- 10: examiner, mcp-integration (exams, MCP servers)
+- 11: marker (marking algorithms, grading)
+- 12: reviewer (code review, quality)
+- 13: planner (task breakdown, planning)
+
+**Subagents (5)**:
+- alembic-migration-writer
+- fastapi-route-builder
+- sqlmodel-schema-designer
+- sqlmodel-query-optimizer
+- vercel-sanitizer
+
+**Skills (22)**:
+- Backend: alembic-migration-creation, fastapi-route-implementation, sqlmodel-database-schema-design, multi-tenant-query-pattern, pydantic-schema-validation, bcrypt-password-hashing, pytest-testing-patterns
+- Frontend: shadcn-ui-components, resource-bank-content
+- AI: anthropic-api-patterns, confidence-scoring, supermemo2-scheduling, contextual-interleaving
+- Domain: cambridge-exam-patterns, subject-economics-9708, a-star-grading-rubrics, phd-pedagogy
+- Infrastructure: port-management, uv-package-management, vercel-fastapi-deployment
+- Utilities: sp.upgrade-ri
+
+**Testing**:
+- Simulate context compaction mid-task
+- Verify post-resume hook executes and loads RI
+- Verify RI announcements appear in logs
+- Test that correct RI is selected for task
+
+---
+
 ## Phase-Specific Rules
 
 ### Phase I: Core Infrastructure & Database (Days 1-4)
@@ -1677,4 +1791,4 @@ When constitution changes, update:
 
 ---
 
-**Version**: 3.0.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-23 | **Amendment**: Added Principle XII (PMP Agent)
+**Version**: 3.1.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-27 | **Amendment**: Added Principle XIII (RI Announcement Mandatory) + Post-Resume Hook

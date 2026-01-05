@@ -2,7 +2,7 @@
 
 **Project**: PhD-Level A-Level Teaching & Examination System
 **Current Phase**: Phase I Complete ✅ | Preparing Phase II
-**Last Updated**: 2025-12-18
+**Last Updated**: 2025-12-27
 
 ---
 
@@ -10,14 +10,52 @@
 
 **BEFORE ANY WORK, read these documents in order:**
 
-1. **Constitution** (`.specify/memory/constitution.md`) - 11 non-negotiable principles [30 min]
-2. **Phase-Specific CLAUDE.md** (`specs/phase-N-*/CLAUDE.md`) - Current phase instructions [15 min]
-3. **Session Handoff** (`docs/SESSION_HANDOFF.md`) - Current context and next steps [5 min]
-4. **Methodology Corrections** (`docs/METHODOLOGY_CORRECTIONS.md`) - SpecKitPlus compliance [10 min]
+1. **Post-Resume Hook** (`.claude/hooks/post-resume.md`) - Load RI inventory (16 agents, 5 subagents, 22 skills) [2 min] ⚡ **CRITICAL**
+2. **Constitution** (`.specify/memory/constitution.md`) - 13 non-negotiable principles [30 min]
+3. **Phase-Specific CLAUDE.md** (`specs/phase-N-*/CLAUDE.md`) - Current phase instructions [15 min]
+4. **Session Handoff** (`docs/SESSION_HANDOFF.md`) - Current context and next steps [5 min]
+5. **Methodology Corrections** (`docs/METHODOLOGY_CORRECTIONS.md`) - SpecKitPlus compliance [10 min]
 
-**Total**: ~60 minutes to understand full context
+**Total**: ~62 minutes to understand full context
 
 **Why Critical?** Wrong content = exam failure = student's future damaged. Constitution prevents this.
+
+---
+
+## 🔄 Post-Resume Hook (MANDATORY - After Every Context Compaction)
+
+**Trigger**: EVERY session start, resume, or after context compaction
+
+**Action**: Read `.claude/hooks/post-resume.md` IMMEDIATELY
+
+**Purpose**:
+- Load complete RI inventory (16 agents, 5 subagents, 22 skills)
+- Commit to announcing RI usage with 📢 format
+- Read session context files
+- Ensure continuity after compaction
+
+**Constitutional Requirement**: Principle XIII - RI Announcement Mandatory
+
+**Hook Output Expected**:
+```
+🔄 POST-RESUME HOOK EXECUTED
+- Loaded 16 agents, 5 subagents, 22 skills
+- Constitutional RI announcement requirement acknowledged
+- Session context files read
+
+📋 RELEVANT RI FOR CURRENT TASK:
+- Agent 02: backend-service
+- Skills: sqlmodel-database-schema-design, multi-tenant-query-pattern
+
+✅ COMMITMENT: I will announce every agent/subagent/skill usage with 📢 ANNOUNCING format
+```
+
+**Announcement Format** (MANDATORY):
+```
+📢 ANNOUNCING: Using Agent 02 - Backend Service
+📢 ANNOUNCING: Using Skill: fastapi-route-implementation
+📢 ANNOUNCING: Using Subagent: alembic-migration-writer
+```
 
 ---
 
@@ -239,6 +277,9 @@ my_personal_examiner/
 - Backend PostgreSQL (via API calls), browser localStorage for session persistence (004-coaching-page)
 - TypeScript 5.7+ (Next.js 16+, React 19) + Next.js 16 App Router, React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+, Lucide React (icons) (005-teaching-page)
 - PostgreSQL via REST API calls (backend already implemented) (005-teaching-page)
+- Python 3.11+ (Backend), TypeScript 5.7+ (Frontend) + FastAPI 0.115+, SQLModel, Next.js 16+, React 19, TanStack Query 5.62+ (006-resource-bank)
+- PostgreSQL 16 (Neon) - primary, Local file cache (backend/cache/) - secondary (006-resource-bank)
+- Python 3.11+ (backend) (007-resource-bank-files)
 
 ## Recent Changes
 - 004-coaching-page: Added TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+

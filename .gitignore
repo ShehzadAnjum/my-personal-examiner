@@ -109,3 +109,7 @@ frontend/.pnpm-store/
 frontend/out/
 .vercel
 .env*.local
+
+# Resource Bank - Local file storage (Feature 007)
+backend/resources/
+backend/cache/
