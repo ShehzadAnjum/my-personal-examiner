@@ -1,11 +1,14 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UserProfile } from '@/components/user/UserProfile';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { BookOpen, ChevronRight, Menu, GraduationCap, MessageSquare, FolderOpen, Calendar, FileText } from 'lucide-react';
+import { BookOpen, ChevronRight, Menu, GraduationCap, MessageSquare, FolderOpen, Calendar, Shield, AlertCircle, FileText } from 'lucide-react';
+import { useAdmin } from '@/lib/hooks/useAdmin';
+import { useActiveSubject } from '@/lib/hooks/useSubjects';
+import { useSyllabiForSubject } from '@/lib/hooks/useAcademicLevels';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -17,14 +20,22 @@ import {
 } from '@/components/ui/sheet';
 
 /**
- * Dashboard Header - Shows app title and optionally topic breadcrumb
+ * Dashboard Header - Shows app title and hierarchy breadcrumb
  *
- * When on /teaching/[topicId] page, displays:
- * My Personal Examiner > [Topic Code] [Topic Name]
+ * Feature: 008-academic-level-hierarchy (T051)
+ *
+ * Shows: My Personal Examiner with hierarchy subtitle:
+ * "A-Level > Economics > 9708" (when on teaching pages)
  */
 export function DashboardHeader() {
   const pathname = usePathname();
   const [topicInfo, setTopicInfo] = useState<{ code: string; name: string } | null>(null);
+  const { isAdmin } = useAdmin();
+  const { data: activeSubject, hasSubjects, isLoading: subjectsLoading } = useActiveSubject();
+
+  // Fetch syllabi for active subject to show in hierarchy
+  const { data: syllabi } = useSyllabiForSubject(activeSubject?.id || null);
+  const activeSyllabus = syllabi?.find((s) => s.is_active) || syllabi?.[0];
 
   // Listen for custom events from teaching page
   useEffect(() => {
@@ -68,7 +79,26 @@ export function DashboardHeader() {
               <h1 className="text-lg font-bold text-foreground">
                 My Personal Examiner
               </h1>
-              <p className="text-xs text-muted-foreground">Economics 9708 A-Level</p>
+              {subjectsLoading ? (
+                <p className="text-xs text-muted-foreground">Loading...</p>
+              ) : hasSubjects && activeSubject ? (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span>{activeSubject.academic_level_name}</span>
+                  <ChevronRight className="h-3 w-3" />
+                  <span>{activeSubject.name}</span>
+                  {activeSyllabus && (
+                    <>
+                      <ChevronRight className="h-3 w-3" />
+                      <span className="font-mono font-medium">{activeSyllabus.code}</span>
+                    </>
+                  )}
+                </p>
+              ) : (
+                <p className="text-xs text-amber-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  No subject configured
+                </p>
+              )}
             </div>
           </Link>
 
@@ -109,7 +139,11 @@ export function DashboardHeader() {
                   <GraduationCap className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-medium">Teaching</p>
-                    <p className="text-xs text-muted-foreground">Learn Economics topics</p>
+                    <p className="text-xs text-muted-foreground">
+                      {hasSubjects && activeSubject
+                        ? `${activeSubject.academic_level_name} ${activeSubject.name}${activeSyllabus ? ` (${activeSyllabus.code})` : ''}`
+                        : 'Browse syllabus topics'}
+                    </p>
                   </div>
                 </Link>
                 <Link href="/coaching" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-accent transition-colors">
@@ -133,6 +167,19 @@ export function DashboardHeader() {
                     <p className="text-xs text-muted-foreground">Coming soon...</p>
                   </div>
                 </div>
+                {/* Admin link - only visible for admins */}
+                {isAdmin && (
+                  <>
+                    <div className="my-2 border-t border-border" />
+                    <Link href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-accent transition-colors bg-amber-50 dark:bg-amber-950/30">
+                      <Shield className="h-5 w-5 text-amber-600" />
+                      <div>
+                        <p className="font-medium text-amber-700 dark:text-amber-400">Admin</p>
+                        <p className="text-xs text-amber-600/70">Manage subjects & content</p>
+                      </div>
+                    </Link>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
@@ -157,6 +204,15 @@ export function DashboardHeader() {
                 Resources
               </Button>
             </Link>
+            {/* Admin link - only visible for admins */}
+            {isAdmin && (
+              <Link href="/admin">
+                <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            )}
           </div>
 
           <ThemeToggle />

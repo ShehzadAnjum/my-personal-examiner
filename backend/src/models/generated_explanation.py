@@ -166,6 +166,24 @@ class GeneratedExplanation(SQLModel, table=True):
         description="Last update timestamp",
     )
 
+    # Archive Fields (2026-01-05: For v2+ relinking during syllabus regeneration)
+    archived: bool = Field(
+        default=False,
+        nullable=False,
+        description="Whether this explanation is archived (topic no longer exists)",
+    )
+
+    archive_reason: Optional[str] = Field(
+        default=None,
+        nullable=True,
+        max_length=500,
+        description="Reason for archiving (e.g., 'Topic 1.1.5 not found in new syllabus')",
+    )
+
+    def is_active(self) -> bool:
+        """Check if explanation is active (not archived)."""
+        return not self.archived
+
     def __repr__(self) -> str:
         """String representation for debugging"""
         return (

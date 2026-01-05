@@ -28,6 +28,7 @@
  * ```
  */
 
+import { useState } from 'react';
 import {
   ExplanationSection,
   ExplanationSectionAlwaysExpanded,
@@ -36,6 +37,8 @@ import { BookmarkButton } from './BookmarkButton';
 import { MermaidDiagram } from './MermaidDiagram';
 import { Markdown } from '@/components/ui/markdown';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import type { TopicExplanation } from '@/lib/types/teaching';
 import type { ExplanationSection as SectionName } from '@/lib/api/resources';
 import {
@@ -50,7 +53,17 @@ import {
   LinkIcon,
   RefreshCw,
   Loader2,
+  Sparkles,
+  FileText,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+
+export interface ResourceForSelection {
+  id: string;
+  title: string;
+  resource_type: string;
+}
 
 export interface ExplanationViewProps {
   explanation: TopicExplanation;
@@ -61,6 +74,13 @@ export interface ExplanationViewProps {
   isAdmin?: boolean;
   onSectionRegenerate?: (sectionName: SectionName) => Promise<void>;
   regeneratingSection?: SectionName | null;
+  /** Resource selection for v2+ generation */
+  availableResources?: ResourceForSelection[];
+  onGenerateWithResources?: (resourceIds: string[]) => Promise<void>;
+  isGeneratingAlternative?: boolean;
+  /** Current explanation version info */
+  version?: number;
+  hasV1?: boolean;
 }
 
 export function ExplanationView({
@@ -71,7 +91,36 @@ export function ExplanationView({
   isAdmin = false,
   onSectionRegenerate,
   regeneratingSection = null,
+  availableResources = [],
+  onGenerateWithResources,
+  isGeneratingAlternative = false,
+  version = 1,
+  hasV1 = true,
 }: ExplanationViewProps) {
+  // State for resource selection panel
+  const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [selectedResources, setSelectedResources] = useState<Set<string>>(new Set());
+
+  const handleResourceToggle = (resourceId: string) => {
+    setSelectedResources((prev) => {
+      const next = new Set(prev);
+      if (next.has(resourceId)) {
+        next.delete(resourceId);
+      } else {
+        next.add(resourceId);
+      }
+      return next;
+    });
+  };
+
+  const handleGenerateAlternative = async () => {
+    if (onGenerateWithResources) {
+      await onGenerateWithResources(Array.from(selectedResources));
+      setShowResourcePanel(false);
+      setSelectedResources(new Set());
+    }
+  };
+
   // Admin section regenerate button component
   const AdminRegenButton = ({ section }: { section: SectionName }) => {
     if (!isAdmin || !onSectionRegenerate) return null;
@@ -106,14 +155,118 @@ export function ExplanationView({
           </p>
         </div>
 
-        {/* Bookmark Button */}
-        <div className="flex justify-end">
+        {/* Version Badge and Bookmark Button */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {version > 1 && (
+              <Badge variant="secondary">
+                v{version}
+              </Badge>
+            )}
+            {version === 1 && hasV1 && (
+              <Badge className="bg-blue-600">
+                Official v1
+              </Badge>
+            )}
+          </div>
           <BookmarkButton
             isBookmarked={isBookmarked}
             onClick={() => onBookmarkToggle(!isBookmarked)}
             isLoading={isLoading}
           />
         </div>
+
+        {/* Generate Alternative Version Panel */}
+        {hasV1 && onGenerateWithResources && (
+          <div className="border rounded-lg p-4 bg-muted/30">
+            <button
+              onClick={() => setShowResourcePanel(!showResourcePanel)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="font-medium">Generate Alternative Version</span>
+              </div>
+              {showResourcePanel ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+
+            {showResourcePanel && (
+              <div className="mt-4 space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Select resources to use as context for generating a personalized version
+                  of this explanation.
+                </p>
+
+                {availableResources.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    No resources available. Upload resources to enable this feature.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {availableResources.map((resource) => (
+                      <div
+                        key={resource.id}
+                        className="flex items-center space-x-3 p-2 border rounded hover:bg-muted/50"
+                      >
+                        <Checkbox
+                          id={`resource-${resource.id}`}
+                          checked={selectedResources.has(resource.id)}
+                          onCheckedChange={() => handleResourceToggle(resource.id)}
+                        />
+                        <label
+                          htmlFor={`resource-${resource.id}`}
+                          className="flex-1 cursor-pointer text-sm"
+                        >
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <span>{resource.title}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {resource.resource_type}
+                            </Badge>
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowResourcePanel(false);
+                      setSelectedResources(new Set());
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleGenerateAlternative}
+                    disabled={isGeneratingAlternative}
+                  >
+                    {isGeneratingAlternative ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Generate v{version + 1}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Section 1: Definition (Always Expanded) */}
@@ -394,7 +547,7 @@ export function ExplanationView({
         <p className="text-xs text-muted-foreground text-center">
           Generated by{' '}
           <span className="font-medium capitalize">{explanation.generated_by}</span> AI
-          • Economics 9708 A-Level
+          • Syllabus {explanation.syllabus_code.split('.')[0]}
         </p>
       </div>
     </div>

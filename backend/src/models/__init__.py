@@ -33,8 +33,13 @@ Resource Bank Models (007):
 - SyllabusPointResource: Resource-to-syllabus mapping with relevance scores
 - ExplanationResourceUsage: Track resource usage in explanations
 - StudentResourcePreference: Student-specific resource preferences
+
+Academic Level Hierarchy Models (008):
+- AcademicLevel: Qualification types (A-Level, O-Level, IGCSE, IB)
+- Syllabus: Syllabus versions with codes and year ranges
 """
 
+from src.models.academic_level import AcademicLevel, DEFAULT_ACADEMIC_LEVELS
 from src.models.attempt import Attempt
 from src.models.attempted_question import AttemptedQuestion
 from src.models.coaching_session import CoachingSession
@@ -61,7 +66,8 @@ from src.models.student_learning_path import StudentLearningPath
 from src.models.student_llm_config import StudentLLMConfig
 from src.models.student_resource_preference import StudentResourcePreference
 from src.models.study_plan import StudyPlan
-from src.models.subject import Subject
+from src.models.subject import Subject, SubjectSetupStatus
+from src.models.syllabus import Syllabus
 from src.models.syllabus_point import SyllabusPoint
 from src.models.syllabus_point_resource import SyllabusPointResource
 
@@ -101,4 +107,10 @@ __all__ = [
     "ResourceType",
     "S3SyncStatus",
     "Visibility",
+    # Enums (Admin Setup)
+    "SubjectSetupStatus",
+    # Academic Level Hierarchy (008)
+    "AcademicLevel",
+    "DEFAULT_ACADEMIC_LEVELS",
+    "Syllabus",
 ]

@@ -43,10 +43,23 @@ import {
 import { BookOpen, ChevronDown } from 'lucide-react';
 import type { SyllabusTopic } from '@/lib/types/teaching';
 
+/**
+ * Syllabus context for display
+ * Feature: 008-academic-level-hierarchy (T052)
+ */
+export interface SyllabusContext {
+  code: string;        // e.g., "9708"
+  year_range?: string; // e.g., "2023-2025"
+}
+
 export interface TopicBrowserProps {
   topics: SyllabusTopic[];
   onTopicClick?: (topicId: string) => void;
   isLoading?: boolean;
+  /** Subject name to display (e.g., "Economics"). If not provided, uses generic "Syllabus" */
+  subjectName?: string;
+  /** Syllabus context to display (code and year range) */
+  syllabusContext?: SyllabusContext;
 }
 
 /**
@@ -90,6 +103,8 @@ export function TopicBrowser({
   topics,
   onTopicClick,
   isLoading = false,
+  subjectName,
+  syllabusContext,
 }: TopicBrowserProps) {
   const router = useRouter();
 
@@ -153,6 +168,23 @@ export function TopicBrowser({
     );
   }
 
+  // Build header text with syllabus context
+  const headerText = useMemo(() => {
+    if (subjectName && syllabusContext) {
+      // Full context: "Economics 9708 (2023-2025)"
+      const yearPart = syllabusContext.year_range ? ` (${syllabusContext.year_range})` : '';
+      return `${subjectName} ${syllabusContext.code}${yearPart}`;
+    }
+    if (subjectName) {
+      return `${subjectName} Syllabus`;
+    }
+    if (syllabusContext) {
+      const yearPart = syllabusContext.year_range ? ` (${syllabusContext.year_range})` : '';
+      return `Syllabus ${syllabusContext.code}${yearPart}`;
+    }
+    return 'Syllabus';
+  }, [subjectName, syllabusContext]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -160,7 +192,7 @@ export function TopicBrowser({
         <div className="flex items-center gap-2">
           <BookOpen className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">
-            Economics 9708 Syllabus ({topics.length} topics)
+            {headerText} ({topics.length} topics)
           </h2>
         </div>
       </div>

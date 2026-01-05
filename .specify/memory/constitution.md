@@ -20,7 +20,7 @@ CHANGES MADE:
 6. Established SpecKit workflow integration
 7. Defined repository structure and hygiene rules
 
-PRINCIPLES (13 Non-Negotiable):
+PRINCIPLES (14 Non-Negotiable):
 1. Subject Accuracy is Non-Negotiable
 2. A* Standard Marking Always
 3. Syllabus Synchronization First
@@ -34,6 +34,7 @@ PRINCIPLES (13 Non-Negotiable):
 11. CLAUDE.md Hierarchy (NEW 2025-12-18)
 12. Project Management Professional (PMP) Agent (NEW 2025-12-23)
 13. Reusable Intelligence Announcement Mandatory (NEW 2025-12-27)
+14. UI Discoverability Requirement (NEW 2026-01-05)
 
 SPECKIT WORKFLOW:
 Constitution → Spec → Clarify (optional) → Plan → Tasks → Implementation → Capstone
@@ -1791,4 +1792,57 @@ When constitution changes, update:
 
 ---
 
-**Version**: 3.1.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-27 | **Amendment**: Added Principle XIII (RI Announcement Mandatory) + Post-Resume Hook
+---
+
+### Principle XIV: UI Discoverability Requirement (NEW - 2026-01-05)
+
+**Rule**: Every functional endpoint MUST have a clickable link. If multiple functionalities fall under the same umbrella, they MUST have their own page with menu items or cards.
+
+**What This Means**:
+- NEVER create backend endpoints without corresponding UI access
+- Admin functionality MUST be accessible via navigation (not URL typing)
+- Related features MUST be grouped into a dashboard page with cards/menu
+- Every API capability MUST have visual representation in the UI
+
+**Examples**:
+- **Good**: Admin link in header → Admin Dashboard → Cards for each feature
+- **Good**: Resource upload button → Upload modal → Success/error feedback
+- **Bad**: Admin endpoints exist but require typing `/admin/setup` in URL
+- **Bad**: Feature works via API but has no UI button or link
+
+**Why This Matters**:
+- Users don't read documentation—they explore the UI
+- Hidden functionality is unused functionality
+- Discoverability improves user experience and adoption
+- Prevents "ghost features" that exist but are inaccessible
+- **Result**: Every capability is one click away
+
+**Enforcement**:
+- **Automated**:
+  - Pre-deploy check: Every route in API has corresponding navigation link
+  - UI test: All main features reachable from dashboard within 2 clicks
+- **Manual**:
+  - Feature review: "How does user access this?"
+  - PR checklist: "Added navigation link to new feature?"
+- **AI**:
+  - After implementing endpoint, prompt: "Where is the UI link for this?"
+  - Refuses to mark feature complete without UI access point
+
+**Implementation Pattern**:
+```
+1. New feature → Create backend endpoint
+2. Create navigation link OR dashboard card
+3. If admin feature → Add to Admin Dashboard with card
+4. If user feature → Add to main navigation
+5. Group related features under parent dashboard
+```
+
+**Admin Dashboard Pattern** (established 2026-01-05):
+- Admin link in header (amber/shield icon, admin-only visibility)
+- Admin dashboard page with categorized cards:
+  - Setup category: Subject Setup Wizard, Upload Syllabus
+  - Content Management: Resource Review, Resource Tagging
+  - System: Data Backup, System Metrics
+- Each card links to dedicated feature page
+
+**Version**: 3.2.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2026-01-05 | **Amendment**: Added Principle XIV (UI Discoverability Requirement)

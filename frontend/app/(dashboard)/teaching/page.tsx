@@ -1,48 +1,81 @@
 /**
  * Teaching Page - Main Route
  *
- * Browse and search Economics 9708 syllabus topics.
+ * Browse and search syllabus topics for the active subject.
  * Request PhD-level explanations for any concept.
  *
- * Simple approach using useState + useEffect (like /teach page).
- * No TanStack Query complexity - just direct fetch + localStorage caching.
+ * Dynamic subject support:
+ * - Fetches active subject from database
+ * - Shows "No subjects" state if none configured
+ * - Prompts admin to set up a subject
  *
  * Constitutional Compliance:
  * - Principle I: Subject Accuracy (Cambridge syllabus topics)
  * - Principle III: PhD-level pedagogy (comprehensive topic coverage)
- * - Avoid over-engineering: Simple fetch pattern, no unnecessary libraries
+ * - Principle XIV: UI Discoverability (shows setup prompt when needed)
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TopicBrowser } from '@/components/teaching/TopicBrowser';
 import { TopicSearch } from '@/components/teaching/TopicSearch';
 import { TopicSearchSkeleton } from '@/components/teaching/TopicSearchSkeleton';
-import { BookOpen, Search, AlertCircle } from 'lucide-react';
+import { HierarchyBreadcrumb } from '@/components/teaching/HierarchyBreadcrumb';
+import { useSyllabiForSubject } from '@/lib/hooks/useAcademicLevels';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BookOpen, Search, AlertCircle, Settings, FileUp, ArrowRight } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/lib/hooks/use-toast';
+import { useActiveSubject, formatSubjectShort } from '@/lib/hooks/useSubjects';
+import { useAdmin } from '@/lib/hooks/useAdmin';
 import * as teachingApi from '@/lib/api/teaching';
 import type { SyllabusTopic } from '@/lib/types/teaching';
 
-const CACHE_KEY = 'syllabus_topics_9708';
 const CACHE_VERSION_KEY = 'syllabus_version';
 const CACHE_DURATION_MS = 1000 * 60 * 60 * 24; // 24 hours
+
+/**
+ * Generate cache key based on subject ID (updated for hierarchy)
+ */
+function getCacheKey(subjectId: string): string {
+  return `syllabus_topics_${subjectId}`;
+}
 
 export default function TeachingPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { isAdmin } = useAdmin();
+  const { data: activeSubject, hasSubjects, isLoading: subjectsLoading } = useActiveSubject();
+
   const [activeTab, setActiveTab] = useState<'browse' | 'search'>('browse');
   const [topics, setTopics] = useState<SyllabusTopic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [usingCache, setUsingCache] = useState(false);
 
-  // Fetch topics with localStorage caching (simple approach like /teach)
+  // Fetch syllabi to get active syllabus context (T052)
+  const { data: syllabi } = useSyllabiForSubject(activeSubject?.id || null);
+  const activeSyllabus = syllabi?.find((s) => s.is_active) || syllabi?.[0];
+
+  // Fetch topics with localStorage caching (only when we have an active subject)
   useEffect(() => {
+    // Wait for subjects to load
+    if (subjectsLoading) return;
+
+    // If no subjects, don't try to fetch topics
+    if (!hasSubjects || !activeSubject) {
+      setIsLoading(false);
+      setTopics([]);
+      return;
+    }
+
+    const CACHE_KEY = getCacheKey(activeSubject.id);
+
     async function fetchTopics() {
       try {
         // Try to load from localStorage first (instant load)
@@ -73,8 +106,8 @@ export default function TeachingPage() {
           console.log('🔄 No cache found, fetching from API...');
         }
 
-        // Fetch from API (either no cache, or background sync)
-        const fetchedTopics = await teachingApi.getTopics({ subject_code: '9708' });
+        // Fetch from API using active subject ID
+        const fetchedTopics = await teachingApi.getTopics({ subject_id: activeSubject!.id });
 
         // Update state
         setTopics(fetchedTopics);
@@ -111,7 +144,7 @@ export default function TeachingPage() {
     }
 
     fetchTopics();
-  }, [toast, topics.length]);
+  }, [toast, topics.length, subjectsLoading, hasSubjects, activeSubject]);
 
   // Handle topic selection (navigate to explanation page)
   const handleTopicClick = (topicId: string) => {
@@ -119,16 +152,84 @@ export default function TeachingPage() {
   };
 
   const handleRetry = () => {
+    if (!activeSubject) return;
     setIsLoading(true);
     setError(null);
     // Clear cache and refetch
+    const CACHE_KEY = getCacheKey(activeSubject.id);
     localStorage.removeItem(CACHE_KEY);
     localStorage.removeItem(`${CACHE_KEY}_timestamp`);
     window.location.reload();
   };
 
+  // Show loading state while checking subjects
+  if (subjectsLoading) {
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <TopicSearchSkeleton count={6} />
+      </div>
+    );
+  }
+
+  // Show "No subjects" state when no subjects are configured
+  if (!hasSubjects) {
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <div className="p-4 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-6">
+            <BookOpen className="h-12 w-12 text-amber-600" />
+          </div>
+          <h1 className="text-3xl font-bold mb-3">No Subjects Configured</h1>
+          <p className="text-muted-foreground max-w-md mb-8">
+            {isAdmin
+              ? 'Set up your first subject by uploading a Cambridge syllabus PDF.'
+              : 'Please contact your administrator to set up a subject.'}
+          </p>
+
+          {isAdmin && (
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/admin/setup/syllabus">
+                <Button size="lg" className="gap-2">
+                  <FileUp className="h-5 w-5" />
+                  Upload Syllabus
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="outline" size="lg" className="gap-2">
+                  <Settings className="h-5 w-5" />
+                  Admin Dashboard
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {!isAdmin && (
+            <Card className="max-w-md">
+              <CardHeader>
+                <CardTitle className="text-lg">Getting Started</CardTitle>
+                <CardDescription>
+                  Your administrator needs to complete the initial setup before you can start learning.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Once a subject is configured, you&apos;ll see syllabus topics here with PhD-level explanations available.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
+      {/* Hierarchy Breadcrumb (T050) */}
+      <div className="mb-4">
+        <HierarchyBreadcrumb subject={activeSubject} />
+      </div>
+
       {/* Page Header with Gradient Background */}
       <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 p-8 border border-primary/20">
         {/* Decorative gradient blobs */}
@@ -144,11 +245,13 @@ export default function TeachingPage() {
               <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Teaching
               </h1>
-              <p className="text-sm text-muted-foreground">PhD-Level Economics Explanations</p>
+              <p className="text-sm text-muted-foreground">
+                PhD-Level {activeSubject?.name || 'Subject'} Explanations
+              </p>
             </div>
           </div>
           <p className="text-base text-foreground/80 max-w-2xl">
-            Browse Economics 9708 syllabus topics and request comprehensive, PhD-level explanations
+            Browse {activeSubject ? formatSubjectShort(activeSubject) : ''} syllabus topics and request comprehensive, PhD-level explanations
           </p>
           {usingCache && (
             <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
@@ -191,7 +294,15 @@ export default function TeachingPage() {
           {isLoading ? (
             <TopicSearchSkeleton count={6} />
           ) : (
-            <TopicBrowser topics={topics} onTopicClick={handleTopicClick} />
+            <TopicBrowser
+              topics={topics}
+              onTopicClick={handleTopicClick}
+              subjectName={activeSubject ? formatSubjectShort(activeSubject) : undefined}
+              syllabusContext={activeSyllabus ? {
+                code: activeSyllabus.code,
+                year_range: activeSyllabus.year_range,
+              } : undefined}
+            />
           )}
         </TabsContent>
 
@@ -216,11 +327,13 @@ export default function TeachingPage() {
               <div className="text-sm font-medium text-muted-foreground">Topics Available</div>
             </div>
 
-            {/* Subject Code */}
+            {/* Subject Info */}
             <div className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 border border-secondary/20 hover:border-secondary/40 transition-all duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl -z-10 group-hover:scale-150 transition-transform duration-500" />
-              <div className="text-5xl font-black text-secondary mb-2">9708</div>
-              <div className="text-sm font-medium text-muted-foreground">Economics A-Level</div>
+              <div className="text-3xl font-black text-secondary mb-2">{activeSubject?.name || '—'}</div>
+              <div className="text-sm font-medium text-muted-foreground">
+                {activeSubject ? `${activeSubject.academic_level_name}` : 'No Subject'}
+              </div>
             </div>
 
             {/* Quality Level */}

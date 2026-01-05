@@ -117,13 +117,21 @@
 - Where to find phase/feature instructions
 
 **Phase-Specific** (`/specs/phase-N-*/CLAUDE.md`)
-- Phase I: `specs/phase-1-core-infrastructure/CLAUDE.md` (auth, database, testing)
-- Phase II: `specs/phase-2-question-bank/CLAUDE.md` (PDF extraction, questions)
-- Phase III: `specs/phase-3-ai-marking/CLAUDE.md` (marking engines, feedback)
-- Phase IV: `specs/phase-4-web-ui/CLAUDE.md` (Next.js, UI components)
-- Phase V: `specs/phase-5-advanced-features/CLAUDE.md` (CLI, MCP servers)
+- Phase I: `specs/phase-1-core-infrastructure/CLAUDE.md` (auth, database, testing) ✅
+- Phase II: `specs/phase-2-question-bank/CLAUDE.md` (PDF extraction, questions) ✅
+- Phase III: `specs/phase-3-ai-teaching-roles/CLAUDE.md` (6 AI agents, marking) ✅
+- Phase IV: `specs/phase-4-web-ui/CLAUDE.md` (Next.js, UI components) ✅
+- Phase V: `specs/phase-5-advanced-features/CLAUDE.md` (CLI, MCP servers) ✅
 
-**Feature-Specific** (`/specs/features/<feature>/CLAUDE.md`) - Only if needed
+**Feature-Specific** (`/specs/00X-*/`) - Individual feature specs with spec.md, plan.md, tasks.md
+
+**Modular Rules** (`.claude/rules/`) - Focused behavioral constraints
+- `multi-tenant-security.md` - Student data isolation
+- `cambridge-accuracy.md` - Content accuracy requirements
+- `marking-standards.md` - PhD-level marking criteria
+- `spec-driven-development.md` - No code before spec
+- `testing-requirements.md` - 80% coverage gates
+- `ri-announcement.md` - Agent/skill usage announcement
 
 **Rule**: No CLAUDE.md file should exceed 300 lines. Split into subdirectories if larger.
 
@@ -209,15 +217,28 @@
 ```
 my_personal_examiner/
 ├── CLAUDE.md                          # This file (project-wide)
-├── .specify/memory/constitution.md    # 11 principles
+├── .specify/memory/constitution.md    # 13 principles
+├── .claude/
+│   ├── agents/                        # 16 long-lived domain owners
+│   ├── subagents/                     # 5 narrow task specialists
+│   ├── skills/                        # 22+ reusable knowledge blocks
+│   ├── rules/                         # Modular behavioral constraints
+│   ├── hooks/                         # Event-triggered scripts
+│   └── RI_INVENTORY.md                # Complete RI catalog
 ├── specs/
-│   ├── phase-1-core-infrastructure/
-│   │   ├── CLAUDE.md                  # Phase I instructions
-│   │   ├── spec.md, plan.md, tasks.md
-│   │   └── capstone.md
-│   ├── phase-2-question-bank/
-│   │   └── CLAUDE.md                  # Phase II instructions
-│   └── ...
+│   ├── phase-1-core-infrastructure/   # Phase I meta (CLAUDE.md)
+│   ├── phase-2-question-bank/         # Phase II meta (CLAUDE.md)
+│   ├── phase-3-ai-teaching-roles/     # Phase III meta (CLAUDE.md + spec)
+│   ├── phase-4-web-ui/                # Phase IV meta (CLAUDE.md)
+│   ├── phase-5-advanced-features/     # Phase V meta (CLAUDE.md)
+│   ├── 001-phase-1-infra/             # Feature: Core infrastructure
+│   ├── 004-coaching-page/             # Feature: Coaching UI
+│   ├── 005-teaching-page/             # Feature: Teaching UI
+│   ├── 006-resource-bank/             # Feature: Resource Bank
+│   └── 007-resource-bank-files/       # Feature: File management
+├── resources/                          # Learning materials (hierarchical)
+│   └── cambridge-a-level/
+│       └── economics-9708/            # Syllabus, textbooks, past papers
 ├── history/
 │   ├── adr/                           # Architecture Decision Records
 │   └── prompts/                       # Prompt History Records
@@ -240,9 +261,14 @@ my_personal_examiner/
 - Testing (40 tests, 82% coverage)
 - Phase gate passed
 
-**Phase II**: ⏳ PREPARING
-- Must use /sp.specify → /sp.plan → /sp.tasks workflow
-- See `specs/phase-2-question-bank/CLAUDE.md` (to be created)
+**Feature Development**: 🔄 IN PROGRESS
+- 004-coaching-page: ✅ Complete
+- 005-teaching-page: ✅ Complete
+- 006-resource-bank: ✅ Complete
+- 007-resource-bank-files: 🔄 In Progress
+
+**Phase II**: 📋 PLANNED
+- See `specs/phase-2-question-bank/CLAUDE.md` for details
 
 ---
 
@@ -267,10 +293,20 @@ my_personal_examiner/
 
 ---
 
-**Version**: 2.0.0 | **Last Updated**: 2025-12-18 | **Next Review**: After Phase II
+**Version**: 2.1.0 | **Last Updated**: 2026-01-05 | **Next Review**: After Phase II
 **Methodology**: SpecKitPlus (Strict compliance enforced)
 
 🎓 **Remember**: Every decision affects students' A-Level exam success. Quality over speed. Always.
+
+---
+
+## 📂 Directory Structure (Updated 2026-01-05)
+
+Recent restructuring completed:
+- ✅ Phase CLAUDE.md files created (phases 2, 3, 5)
+- ✅ `.claude/rules/` directory with 6 modular rules
+- ✅ `resources/` hierarchical learning materials
+- ✅ Feature spec structure standardized
 
 ## Active Technologies
 - TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+ (004-coaching-page)
@@ -280,6 +316,8 @@ my_personal_examiner/
 - Python 3.11+ (Backend), TypeScript 5.7+ (Frontend) + FastAPI 0.115+, SQLModel, Next.js 16+, React 19, TanStack Query 5.62+ (006-resource-bank)
 - PostgreSQL 16 (Neon) - primary, Local file cache (backend/cache/) - secondary (006-resource-bank)
 - Python 3.11+ (backend) (007-resource-bank-files)
+- Python 3.11+, TypeScript 5.7+ + FastAPI 0.115+, SQLModel, Next.js 16+, React 19, TanStack Query 5.62+ (008-academic-level-hierarchy)
+- PostgreSQL 16 (Neon Serverless) (008-academic-level-hierarchy)
 
 ## Recent Changes
 - 004-coaching-page: Added TypeScript 5.7+ + Next.js 16+ (App Router), React 19, shadcn/ui, Tailwind CSS 4, TanStack Query 5.62+

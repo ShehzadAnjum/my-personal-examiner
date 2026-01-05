@@ -151,7 +151,9 @@ async def shutdown_event() -> None:
 
 # Router registration
 # Phase 3 (US1): Authentication (register)
+from src.routes import academic_levels  # Academic Level Hierarchy (008)
 from src.routes import admin_resources  # Resource Bank admin review (007 - US4)
+from src.routes import admin_setup  # Admin setup wizard (Admin-First Topic Generation)
 from src.routes import auth
 from src.routes import auth_extra  # Better-auth integration endpoints
 from src.routes import coaching  # Phase III US2: Coach Agent
@@ -170,6 +172,8 @@ from src.routes import teaching  # Phase III US1: Teacher Agent
 
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(auth_extra.router, tags=["auth-extra"])  # Better-auth student lookup
+app.include_router(academic_levels.router, prefix="/api", tags=["academic-levels"])  # 008: Academic Level Hierarchy
+app.include_router(academic_levels.hierarchy_router, prefix="/api", tags=["hierarchy"])  # 008: Full hierarchy tree
 app.include_router(questions.router, tags=["questions"])  # Phase II US1: Upload & Storage
 app.include_router(exams.router, tags=["exams"])  # Phase II US6: Exam Generation
 app.include_router(syllabus.router, tags=["syllabus"])  # Phase II US7: Syllabus Tagging
@@ -177,6 +181,7 @@ app.include_router(subjects.router, tags=["subjects"])  # Phase II: Subject list
 app.include_router(resources.router, tags=["resources"])  # Resource Bank US1: View Explanations
 app.include_router(resource_sync.router, tags=["resource-sync"])  # Resource Bank sync (007 - US2)
 app.include_router(admin_resources.router, tags=["admin-resources"])  # Admin review (007 - US4)
+app.include_router(admin_setup.router, tags=["admin-setup"])  # Admin setup wizard
 app.include_router(resource_tagging.router, tags=["resource-tagging"])  # Admin tagging (007 - US6)
 app.include_router(metrics.router, tags=["metrics"])  # Observability metrics (007 - Phase 10)
 app.include_router(teaching.router, tags=["teaching"])  # Phase III US1: Teacher Agent
