@@ -14,7 +14,9 @@ resources/
 │       ├── mark-schemes/       # Mark schemes (MS)
 │       ├── additional-materials/ # Notes, summaries, guides
 │       ├── online-resources/   # Links to online content
-│       └── media/              # Videos, diagrams, animations
+│       ├── media/              # Videos, diagrams, animations
+│       └── user-uploads/       # Student uploads for THIS subject
+│           └── [student-id]/   # Per-student isolation
 │
 ├── cambridge-o-level/          # Cambridge O-Level (Age 14-16)
 │   └── [subject-code]/         # Subjects to be added
@@ -22,11 +24,8 @@ resources/
 ├── igcse/                      # Cambridge IGCSE (Age 14-16)
 │   └── [subject-code]/         # Subjects to be added
 │
-├── matric/                     # Pakistan Matriculation
-│   └── [subject]/              # Subjects to be added
-│
-└── user-uploads/               # User-uploaded content
-    └── [student-id]/           # Per-student isolated storage
+└── matric/                     # Pakistan Matriculation
+    └── [subject]/              # Subjects to be added
 ```
 
 ## Supported Qualifications
@@ -78,10 +77,23 @@ Use publisher's full title with edition:
 
 ## Multi-Tenant Isolation
 
-User-uploaded content is stored in `user-uploads/{student-id}/` to ensure:
+User-uploaded content is stored within each subject at `{subject}/user-uploads/{student-id}/`:
+
+```
+resources/cambridge-a-level/economics-9708/user-uploads/
+├── student-abc123/           # Student A's Economics resources
+│   ├── my-notes.pdf
+│   └── practice-questions.pdf
+└── student-xyz789/           # Student B's Economics resources
+    └── revision-guide.pdf
+```
+
+Benefits:
 - Data isolation between students
-- Easy backup/restore per user
+- Resources stay with their subject context
+- Easy backup/restore per user per subject
 - Compliance with privacy requirements
+- Enables subject-specific resource recommendations
 
 ## Current Subjects
 

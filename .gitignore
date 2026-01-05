@@ -112,7 +112,9 @@ frontend/out/
 
 # Resource Bank - Local file storage (Feature 007)
 backend/cache/
-resources/user-uploads/
+
+# User uploads within subjects (multi-tenant isolation)
+resources/**/user-uploads/
 
 # Large resource files (keep structure, ignore large binaries in dev)
 # Uncomment below to ignore large files during development:
