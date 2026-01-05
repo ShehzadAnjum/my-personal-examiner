@@ -21,6 +21,9 @@ from sqlmodel import Session, select
 
 from src.models.syllabus_point import SyllabusPoint
 from src.models.student import Student
+from src.models.resource import Resource
+from src.models.generated_explanation import GeneratedExplanation
+from src.models.enums import GeneratedByType, LLMProvider
 from src.schemas.teaching_schemas import (
     ExplainConceptRequest,
     TopicExplanation,
@@ -36,6 +39,7 @@ from src.ai_integration.prompt_templates.teacher_prompts import (
     TeacherPrompts,
     create_explanation_prompt,
 )
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -277,3 +281,158 @@ async def explain_concept(
         logger.error(f"Failed to build TopicExplanation from LLM response: {e}")
         logger.debug(f"Response data: {response_data}")
         raise LLMResponseError(f"LLM response structure invalid: {str(e)}") from e
+
+
+async def generate_explanation_with_resources(
+    session: Session,
+    syllabus_point: SyllabusPoint,
+    resources: list[Resource],
+    admin_id: Optional[UUID] = None,
+    student_id: Optional[UUID] = None,
+    is_v1: bool = False,
+    llm_orchestrator: Optional[LLMFallbackOrchestrator] = None,
+) -> GeneratedExplanation:
+    """
+    Generate explanation for a syllabus point using selected resources as context.
+
+    This function is used for both:
+    - v1 admin generation (is_v1=True, admin_id set)
+    - v2+ student generation (is_v1=False, student_id set)
+
+    Args:
+        session: Database session
+        syllabus_point: SyllabusPoint to generate explanation for
+        resources: List of Resource objects to use as context
+        admin_id: Admin student ID (for v1 generation)
+        student_id: Student ID (for v2+ generation)
+        is_v1: Whether this is a v1 (admin) explanation
+        llm_orchestrator: Optional LLM orchestrator
+
+    Returns:
+        GeneratedExplanation: The generated explanation entity
+
+    Constitutional Compliance:
+        - Principle I: Uses resources as context (syllabus-aligned)
+        - Principle V: Tracks generator_student_id for multi-tenant
+    """
+    # Build resource context for prompt
+    resource_context = ""
+    if resources:
+        resource_texts = []
+        for r in resources:
+            # Get extracted text from resource
+            if r.extracted_text:
+                resource_texts.append(
+                    f"--- Resource: {r.title} ---\n{r.extracted_text[:5000]}\n"
+                )
+            elif r.resource_metadata and r.resource_metadata.get("excerpt_text"):
+                resource_texts.append(
+                    f"--- Resource: {r.title} ---\n{r.resource_metadata['excerpt_text'][:5000]}\n"
+                )
+
+        if resource_texts:
+            resource_context = "\n\n## Reference Materials:\n" + "\n".join(resource_texts)
+
+    # Parse learning outcomes
+    learning_outcomes = []
+    if syllabus_point.learning_outcomes:
+        learning_outcomes = [
+            line.strip()
+            for line in syllabus_point.learning_outcomes.split("\n")
+            if line.strip()
+        ]
+
+    # Build prompt with resource context
+    base_prompt = create_explanation_prompt(
+        syllabus_code=syllabus_point.code,
+        concept_name=syllabus_point.description.split(":")[0].strip()
+        if ":" in syllabus_point.description
+        else syllabus_point.description[:50],
+        syllabus_description=syllabus_point.description,
+        learning_outcomes=learning_outcomes,
+        student_context=None,
+    )
+
+    if resource_context:
+        prompt = f"{base_prompt}\n\n{resource_context}\n\nUse the reference materials above to enhance your explanation with specific examples and accurate details."
+    else:
+        prompt = base_prompt
+
+    # Initialize LLM orchestrator
+    if llm_orchestrator is None:
+        llm_orchestrator = LLMFallbackOrchestrator()
+
+    # Generate explanation
+    try:
+        logger.info(f"Generating {'v1' if is_v1 else 'v2+'} explanation for {syllabus_point.code}")
+
+        response_text, provider = await llm_orchestrator.generate_with_fallback(
+            prompt=prompt,
+            temperature=0.3,
+            max_tokens=4000,
+            system_prompt=TeacherPrompts.SYSTEM_PROMPT,
+        )
+
+        logger.info(f"LLM response received from {provider.value}")
+
+    except Exception as e:
+        logger.error(f"LLM generation failed: {e}")
+        raise LLMResponseError(f"Failed to generate explanation: {str(e)}") from e
+
+    # Parse JSON response
+    try:
+        json_text = response_text.strip()
+        if json_text.startswith("```json"):
+            json_text = json_text.split("```json")[1].split("```")[0].strip()
+        elif json_text.startswith("```"):
+            json_text = json_text.split("```")[1].split("```")[0].strip()
+
+        content = json.loads(json_text)
+
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse LLM response as JSON: {e}")
+        raise LLMResponseError(f"LLM response not valid JSON: {str(e)}") from e
+
+    # Determine version number
+    if is_v1:
+        version = 1
+        generated_by = GeneratedByType.SYSTEM
+        generator_student_id = None
+    else:
+        # Find next version number for this topic
+        from sqlmodel import func
+        max_version = session.exec(
+            select(func.max(GeneratedExplanation.version)).where(
+                GeneratedExplanation.syllabus_point_id == syllabus_point.id
+            )
+        ).one()
+        version = (max_version or 0) + 1
+        generated_by = GeneratedByType.STUDENT
+        generator_student_id = student_id
+
+    # Map provider to enum
+    provider_map = {
+        "anthropic": LLMProvider.ANTHROPIC,
+        "openai": LLMProvider.OPENAI,
+        "google": LLMProvider.GOOGLE,
+    }
+    llm_provider = provider_map.get(provider.value, LLMProvider.ANTHROPIC)
+
+    # Create signature from content
+    content_str = json.dumps(content, sort_keys=True)
+    signature = hashlib.sha256(content_str.encode()).hexdigest()
+
+    # Create GeneratedExplanation entity
+    explanation = GeneratedExplanation(
+        syllabus_point_id=syllabus_point.id,
+        version=version,
+        content=content,
+        generated_by=generated_by,
+        generator_student_id=generator_student_id,
+        llm_provider=llm_provider,
+        llm_model=f"{provider.value}-default",  # TODO: Get actual model name
+        token_cost=0,  # TODO: Track token usage
+        signature=signature,
+    )
+
+    return explanation

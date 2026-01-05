@@ -109,3 +109,17 @@ frontend/.pnpm-store/
 frontend/out/
 .vercel
 .env*.local
+
+# Resource Bank - Local file storage (Feature 007)
+backend/cache/
+
+# User uploads within subjects (multi-tenant isolation)
+resources/**/user-uploads/
+
+# Large resource files (keep structure, ignore large binaries in dev)
+# Uncomment below to ignore large files during development:
+# resources/**/*.pdf
+# resources/**/*.mp4
+
+# Uploads directory
+backend/uploads/

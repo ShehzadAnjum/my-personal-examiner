@@ -39,7 +39,11 @@ export async function GET() {
 
       if (response.ok) {
         const student = await response.json();
-        return NextResponse.json({ student_id: student.id });
+        return NextResponse.json({
+          student_id: student.id,
+          email: student.email,
+          is_admin: student.is_admin || false,
+        });
       }
 
       // If 404, student doesn't exist, create one
@@ -67,7 +71,10 @@ export async function GET() {
         }
 
         const newStudent = await createResponse.json();
-        return NextResponse.json({ student_id: newStudent.id });
+        return NextResponse.json({
+          student_id: newStudent.id,
+          is_admin: false, // New students are never admins
+        });
       }
 
       throw new Error(`Unexpected response: ${response.status}`);

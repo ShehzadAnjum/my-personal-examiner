@@ -85,6 +85,13 @@ class Student(SQLModel, table=True):
         description='Target grades by subject, e.g., {"9708": "A*"}',
     )
 
+    # Admin Flag (Resource Bank feature - 006)
+    is_admin: bool = Field(
+        default=False,
+        nullable=False,
+        description="Whether student has admin privileges for content generation",
+    )
+
     # Timestamps
     created_at: datetime = Field(
         default_factory=datetime.utcnow,

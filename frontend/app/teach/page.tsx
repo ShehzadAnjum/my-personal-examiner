@@ -9,6 +9,7 @@ import {
   APIError,
 } from '@/lib/api';
 import mermaid from 'mermaid';
+import { useActiveSubject, formatSubjectShort } from '@/lib/hooks/useSubjects';
 
 // Mermaid Diagram Component
 function MermaidDiagram({ code, id }: { code: string; id: string }) {
@@ -70,6 +71,9 @@ export default function TeachPage() {
   const [currentVersion, setCurrentVersion] = useState(0);
   const [explanationVersions, setExplanationVersions] = useState<CachedExplanation['versions']>([]);
   const [usingCache, setUsingCache] = useState(false);
+
+  // Get active subject for dynamic display (T064)
+  const { data: activeSubject } = useActiveSubject();
 
   // Demo student ID - will be replaced with auth later
   const DEMO_STUDENT_ID = process.env.NEXT_PUBLIC_DEMO_STUDENT_ID || '550e8400-e29b-41d4-a716-446655440000';
@@ -352,7 +356,7 @@ export default function TeachPage() {
       {/* Left Sidebar - Syllabus Navigation */}
       <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">📚 Economics 9708</h2>
+          <h2 className="text-2xl font-bold text-gray-900">📚 {activeSubject ? formatSubjectShort(activeSubject) : 'Loading...'}</h2>
           <p className="text-sm text-gray-600 mt-1">Select a topic to learn</p>
           {usingCache && (
             <p className="text-xs text-green-600 mt-2 flex items-center gap-1">

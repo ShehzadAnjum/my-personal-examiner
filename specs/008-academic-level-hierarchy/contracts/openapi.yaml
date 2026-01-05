@@ -1,0 +1,601 @@
+openapi: 3.1.0
+info:
+  title: Academic Level Hierarchy API
+  version: 1.0.0
+  description: API for managing academic levels, subjects, and syllabi
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development
+
+paths:
+  /academic-levels:
+    get:
+      summary: List all academic levels
+      operationId: listAcademicLevels
+      tags:
+        - Academic Levels
+      responses:
+        '200':
+          description: List of academic levels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AcademicLevelSummary'
+
+    post:
+      summary: Create academic level
+      operationId: createAcademicLevel
+      tags:
+        - Academic Levels
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicLevelCreate'
+      responses:
+        '201':
+          description: Academic level created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicLevel'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '409':
+          description: Conflict - code already exists
+
+  /academic-levels/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get academic level with subjects
+      operationId: getAcademicLevel
+      tags:
+        - Academic Levels
+      responses:
+        '200':
+          description: Academic level with subjects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicLevelDetail'
+        '404':
+          description: Not found
+
+    put:
+      summary: Update academic level
+      operationId: updateAcademicLevel
+      tags:
+        - Academic Levels
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicLevelUpdate'
+      responses:
+        '200':
+          description: Academic level updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicLevel'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+
+    delete:
+      summary: Delete academic level
+      operationId: deleteAcademicLevel
+      tags:
+        - Academic Levels
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Cannot delete - has subjects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+
+  /academic-levels/{id}/subjects:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: List subjects under academic level
+      operationId: listSubjectsForLevel
+      tags:
+        - Subjects
+      responses:
+        '200':
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectSummary'
+        '404':
+          description: Academic level not found
+
+    post:
+      summary: Create subject under academic level
+      operationId: createSubjectForLevel
+      tags:
+        - Subjects
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectCreate'
+      responses:
+        '201':
+          description: Subject created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '404':
+          description: Academic level not found
+        '409':
+          description: Subject name already exists under this level
+
+  /subjects/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get subject with syllabi
+      operationId: getSubject
+      tags:
+        - Subjects
+      responses:
+        '200':
+          description: Subject with syllabi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectDetail'
+        '404':
+          description: Not found
+
+  /subjects/{id}/syllabi:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: List syllabi for subject
+      operationId: listSyllabiForSubject
+      tags:
+        - Syllabi
+      responses:
+        '200':
+          description: List of syllabi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SyllabusSummary'
+        '404':
+          description: Subject not found
+
+    post:
+      summary: Create syllabus for subject
+      operationId: createSyllabusForSubject
+      tags:
+        - Syllabi
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyllabusCreate'
+      responses:
+        '201':
+          description: Syllabus created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Syllabus'
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '404':
+          description: Subject not found
+        '409':
+          description: Syllabus code already exists for this subject
+
+  /syllabi/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get syllabus with topics
+      operationId: getSyllabus
+      tags:
+        - Syllabi
+      responses:
+        '200':
+          description: Syllabus with topics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyllabusDetail'
+        '404':
+          description: Not found
+
+  /hierarchy:
+    get:
+      summary: Get full hierarchy tree
+      operationId: getHierarchy
+      tags:
+        - Hierarchy
+      description: Returns the complete academic level -> subject -> syllabus tree
+      responses:
+        '200':
+          description: Full hierarchy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HierarchyTree'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Academic Level
+    AcademicLevelCreate:
+      type: object
+      required:
+        - name
+        - code
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: "A-Level"
+        code:
+          type: string
+          maxLength: 10
+          example: "A"
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        exam_board:
+          type: string
+          maxLength: 100
+          default: "Cambridge International"
+
+    AcademicLevelUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        exam_board:
+          type: string
+          maxLength: 100
+
+    AcademicLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+          nullable: true
+        exam_board:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AcademicLevelSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+        exam_board:
+          type: string
+        subjects_count:
+          type: integer
+
+    AcademicLevelDetail:
+      allOf:
+        - $ref: '#/components/schemas/AcademicLevel'
+        - type: object
+          properties:
+            subjects:
+              type: array
+              items:
+                $ref: '#/components/schemas/SubjectSummary'
+
+    # Subject
+    SubjectCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: "Economics"
+        code:
+          type: string
+          maxLength: 20
+          nullable: true
+
+    Subject:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        academic_level_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+          nullable: true
+        setup_status:
+          type: string
+          enum: [pending, syllabus_uploaded, topics_generated, explanations_generated, complete]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SubjectSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        setup_status:
+          type: string
+        syllabi_count:
+          type: integer
+
+    SubjectDetail:
+      allOf:
+        - $ref: '#/components/schemas/Subject'
+        - type: object
+          properties:
+            academic_level:
+              $ref: '#/components/schemas/AcademicLevelSummary'
+            syllabi:
+              type: array
+              items:
+                $ref: '#/components/schemas/SyllabusSummary'
+
+    # Syllabus
+    SyllabusCreate:
+      type: object
+      required:
+        - code
+        - year_range
+      properties:
+        code:
+          type: string
+          maxLength: 20
+          example: "9708"
+        year_range:
+          type: string
+          maxLength: 20
+          example: "2023-2025"
+
+    Syllabus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        subject_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        year_range:
+          type: string
+        version:
+          type: integer
+        is_active:
+          type: boolean
+        syllabus_resource_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SyllabusSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        year_range:
+          type: string
+        is_active:
+          type: boolean
+        topics_count:
+          type: integer
+
+    SyllabusDetail:
+      allOf:
+        - $ref: '#/components/schemas/Syllabus'
+        - type: object
+          properties:
+            subject:
+              $ref: '#/components/schemas/SubjectSummary'
+            topics:
+              type: array
+              items:
+                $ref: '#/components/schemas/SyllabusPoint'
+
+    # Syllabus Point
+    SyllabusPoint:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        syllabus_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        description:
+          type: string
+        topics:
+          type: string
+          nullable: true
+        learning_outcomes:
+          type: string
+          nullable: true
+
+    # Hierarchy Tree
+    HierarchyTree:
+      type: object
+      properties:
+        academic_levels:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              code:
+                type: string
+              subjects:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    name:
+                      type: string
+                    syllabi:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          code:
+                            type: string
+                          year_range:
+                            type: string
+                          is_active:
+                            type: boolean
+                          topics_count:
+                            type: integer
+
+    # Error
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+        code:
+          type: string

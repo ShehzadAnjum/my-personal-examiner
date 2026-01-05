@@ -1,0 +1,123 @@
+openapi: 3.0.3
+info:
+  title: Resource Bank - Admin Review API
+  version: 1.0.0
+  description: Admin workflows for reviewing and approving user-uploaded resources
+
+paths:
+  /api/admin/resources/pending:
+    get:
+      summary: List pending resources for review
+      tags: [Admin]
+      responses:
+        '200':
+          description: Pending resources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    title:
+                      type: string
+                    uploaded_by:
+                      type: object
+                      properties:
+                        student_id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                    upload_date:
+                      type: string
+                      format: date-time
+                    file_size:
+                      type: integer
+
+  /api/admin/resources/{id}/preview:
+    get:
+      summary: Preview first 3 pages of PDF
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: PDF preview
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pages:
+                    type: array
+                    items:
+                      type: string
+                      description: Base64-encoded page image
+
+  /api/admin/resources/{id}/approve:
+    put:
+      summary: Approve resource (transition to public)
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Resource approved
+        '404':
+          description: Resource not found
+
+  /api/admin/resources/{id}/reject:
+    put:
+      summary: Reject resource (delete file + DB record)
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Resource rejected and deleted
+
+  /api/admin/resources/{id}/metadata:
+    put:
+      summary: Edit resource metadata before approval
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Metadata updated

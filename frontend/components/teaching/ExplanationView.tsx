@@ -28,6 +28,7 @@
  * ```
  */
 
+import { useState } from 'react';
 import {
   ExplanationSection,
   ExplanationSectionAlwaysExpanded,
@@ -35,7 +36,11 @@ import {
 import { BookmarkButton } from './BookmarkButton';
 import { MermaidDiagram } from './MermaidDiagram';
 import { Markdown } from '@/components/ui/markdown';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import type { TopicExplanation } from '@/lib/types/teaching';
+import type { ExplanationSection as SectionName } from '@/lib/api/resources';
 import {
   BookOpenIcon,
   HashIcon,
@@ -46,13 +51,36 @@ import {
   AlertCircleIcon,
   PenToolIcon,
   LinkIcon,
+  RefreshCw,
+  Loader2,
+  Sparkles,
+  FileText,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+
+export interface ResourceForSelection {
+  id: string;
+  title: string;
+  resource_type: string;
+}
 
 export interface ExplanationViewProps {
   explanation: TopicExplanation;
   isBookmarked: boolean;
   onBookmarkToggle: (isBookmarked: boolean) => void;
   isLoading?: boolean;
+  /** Admin-related props for section regeneration */
+  isAdmin?: boolean;
+  onSectionRegenerate?: (sectionName: SectionName) => Promise<void>;
+  regeneratingSection?: SectionName | null;
+  /** Resource selection for v2+ generation */
+  availableResources?: ResourceForSelection[];
+  onGenerateWithResources?: (resourceIds: string[]) => Promise<void>;
+  isGeneratingAlternative?: boolean;
+  /** Current explanation version info */
+  version?: number;
+  hasV1?: boolean;
 }
 
 export function ExplanationView({
@@ -60,7 +88,60 @@ export function ExplanationView({
   isBookmarked,
   onBookmarkToggle,
   isLoading = false,
+  isAdmin = false,
+  onSectionRegenerate,
+  regeneratingSection = null,
+  availableResources = [],
+  onGenerateWithResources,
+  isGeneratingAlternative = false,
+  version = 1,
+  hasV1 = true,
 }: ExplanationViewProps) {
+  // State for resource selection panel
+  const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [selectedResources, setSelectedResources] = useState<Set<string>>(new Set());
+
+  const handleResourceToggle = (resourceId: string) => {
+    setSelectedResources((prev) => {
+      const next = new Set(prev);
+      if (next.has(resourceId)) {
+        next.delete(resourceId);
+      } else {
+        next.add(resourceId);
+      }
+      return next;
+    });
+  };
+
+  const handleGenerateAlternative = async () => {
+    if (onGenerateWithResources) {
+      await onGenerateWithResources(Array.from(selectedResources));
+      setShowResourcePanel(false);
+      setSelectedResources(new Set());
+    }
+  };
+
+  // Admin section regenerate button component
+  const AdminRegenButton = ({ section }: { section: SectionName }) => {
+    if (!isAdmin || !onSectionRegenerate) return null;
+    const isRegenerating = regeneratingSection === section;
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-6 px-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+        onClick={() => onSectionRegenerate(section)}
+        disabled={!!regeneratingSection}
+        title={`Regenerate ${section} section`}
+      >
+        {isRegenerating ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <RefreshCw className="h-3 w-3" />
+        )}
+      </Button>
+    );
+  };
   return (
     <div className="space-y-6 w-full max-w-none overflow-visible">
       {/* Header Section */}
@@ -74,20 +155,125 @@ export function ExplanationView({
           </p>
         </div>
 
-        {/* Bookmark Button */}
-        <div className="flex justify-end">
+        {/* Version Badge and Bookmark Button */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {version > 1 && (
+              <Badge variant="secondary">
+                v{version}
+              </Badge>
+            )}
+            {version === 1 && hasV1 && (
+              <Badge className="bg-blue-600">
+                Official v1
+              </Badge>
+            )}
+          </div>
           <BookmarkButton
             isBookmarked={isBookmarked}
             onClick={() => onBookmarkToggle(!isBookmarked)}
             isLoading={isLoading}
           />
         </div>
+
+        {/* Generate Alternative Version Panel */}
+        {hasV1 && onGenerateWithResources && (
+          <div className="border rounded-lg p-4 bg-muted/30">
+            <button
+              onClick={() => setShowResourcePanel(!showResourcePanel)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="font-medium">Generate Alternative Version</span>
+              </div>
+              {showResourcePanel ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+
+            {showResourcePanel && (
+              <div className="mt-4 space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Select resources to use as context for generating a personalized version
+                  of this explanation.
+                </p>
+
+                {availableResources.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    No resources available. Upload resources to enable this feature.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {availableResources.map((resource) => (
+                      <div
+                        key={resource.id}
+                        className="flex items-center space-x-3 p-2 border rounded hover:bg-muted/50"
+                      >
+                        <Checkbox
+                          id={`resource-${resource.id}`}
+                          checked={selectedResources.has(resource.id)}
+                          onCheckedChange={() => handleResourceToggle(resource.id)}
+                        />
+                        <label
+                          htmlFor={`resource-${resource.id}`}
+                          className="flex-1 cursor-pointer text-sm"
+                        >
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <span>{resource.title}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {resource.resource_type}
+                            </Badge>
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowResourcePanel(false);
+                      setSelectedResources(new Set());
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleGenerateAlternative}
+                    disabled={isGeneratingAlternative}
+                  >
+                    {isGeneratingAlternative ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Generate v{version + 1}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Section 1: Definition (Always Expanded) */}
       <ExplanationSectionAlwaysExpanded
         title="Definition"
         icon={<BookOpenIcon className="h-5 w-5" />}
+        action={<AdminRegenButton section="definition" />}
       >
         <div className="w-full max-w-none overflow-visible">
           <p
@@ -128,6 +314,7 @@ export function ExplanationView({
       <ExplanationSectionAlwaysExpanded
         title="Core Principles"
         icon={<LightbulbIcon className="h-5 w-5" />}
+        action={<AdminRegenButton section="concept_explanation" />}
       >
         <div className="w-full max-w-none overflow-visible">
           <Markdown className="text-base">
@@ -142,6 +329,7 @@ export function ExplanationView({
           title="Real-World Examples"
           icon={<TrendingUpIcon className="h-5 w-5" />}
           defaultExpanded={false}
+          action={<AdminRegenButton section="real_world_examples" />}
         >
           <div className="space-y-4">
             {explanation.examples.map((example, index) => (
@@ -169,21 +357,31 @@ export function ExplanationView({
           title="Visual Aids"
           icon={<ImageIcon className="h-5 w-5" />}
           defaultExpanded={false}
+          action={<AdminRegenButton section="diagrams" />}
         >
           <div className="space-y-4">
             {explanation.visual_aids.map((aid, index) => (
               <div key={index} className="border rounded-lg p-4 space-y-3">
+                {/* Header with type badge and title */}
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                    {aid.type}
-                  </span>
+                  {aid.type === 'suggested' ? (
+                    <span className="inline-flex items-center rounded-md bg-amber-100 dark:bg-amber-900/30 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                      Suggested
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                      {aid.type}
+                    </span>
+                  )}
                   <h4 className="font-semibold text-base">{aid.title}</h4>
                 </div>
+
+                {/* Description */}
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                   {aid.description}
                 </p>
 
-                {/* Mermaid Diagram */}
+                {/* Mermaid Diagram (if available) */}
                 {aid.mermaid_code && (
                   <MermaidDiagram
                     code={aid.mermaid_code}
@@ -191,7 +389,7 @@ export function ExplanationView({
                   />
                 )}
 
-                {/* ASCII Art */}
+                {/* ASCII Art (if available) */}
                 {aid.ascii_art && (
                   <pre className="bg-slate-900 text-green-400 p-4 rounded overflow-x-auto text-xs font-mono">
                     {aid.ascii_art}
@@ -242,6 +440,7 @@ export function ExplanationView({
             title="Common Misconceptions"
             icon={<AlertCircleIcon className="h-5 w-5" />}
             defaultExpanded={false}
+            action={<AdminRegenButton section="common_misconceptions" />}
           >
             <div className="space-y-3">
               {explanation.common_misconceptions.map((item, index) => (
@@ -282,6 +481,7 @@ export function ExplanationView({
           title="Practice Problems"
           icon={<PenToolIcon className="h-5 w-5" />}
           defaultExpanded={false}
+          action={<AdminRegenButton section="practice_questions" />}
         >
           <div className="space-y-4">
             {explanation.practice_problems.map((problem, index) => (
@@ -327,6 +527,7 @@ export function ExplanationView({
         <ExplanationSectionAlwaysExpanded
           title="Related Concepts"
           icon={<LinkIcon className="h-5 w-5" />}
+          action={<AdminRegenButton section="related_topics" />}
         >
           <div className="flex flex-wrap gap-2">
             {explanation.related_concepts.map((concept, index) => (
@@ -346,7 +547,7 @@ export function ExplanationView({
         <p className="text-xs text-muted-foreground text-center">
           Generated by{' '}
           <span className="font-medium capitalize">{explanation.generated_by}</span> AI
-          • Economics 9708 A-Level
+          • Syllabus {explanation.syllabus_code.split('.')[0]}
         </p>
       </div>
     </div>

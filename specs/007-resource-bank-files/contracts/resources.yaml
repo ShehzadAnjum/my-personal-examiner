@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: Resource Bank - Resource Management API
+  version: 1.0.0
+  description: CRUD operations for resource uploads, downloads, and listing
+
+paths:
+  /api/resources/upload:
+    post:
+      summary: Upload new resource (student or admin)
+      tags: [Resources]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, resource_type, title]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF, video link, or document (max 50MB)
+                resource_type:
+                  $ref: '#/components/schemas/ResourceType'
+                title:
+                  type: string
+                  maxLength: 500
+                source_url:
+                  type: string
+                  format: uri
+                  nullable: true
+      responses:
+        '201':
+          description: Resource uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '400':
+          description: File too large, virus detected, or quota exceeded
+        '401':
+          description: Unauthenticated
+
+  /api/resources:
+    get:
+      summary: List resources with filters
+      tags: [Resources]
+      parameters:
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/ResourceType'
+        - name: visibility
+          in: query
+          schema:
+            $ref: '#/components/schemas/Visibility'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Resource list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  resources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ResourceResponse'
+
+  /api/resources/{id}:
+    get:
+      summary: Get resource details
+      tags: [Resources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Resource details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '403':
+          description: Unauthorized access (private resource)
+        '404':
+          description: Resource not found
+    delete:
+      summary: Delete own resource (students only)
+      tags: [Resources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Resource deleted
+        '403':
+          description: Cannot delete (not owner or approved resource)
+
+  /api/resources/{id}/download:
+    get:
+      summary: Download resource file (signed URL)
+      tags: [Resources]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: sig
+          in: query
+          required: true
+          schema:
+            type: string
+          description: HMAC signature
+        - name: exp
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Expiration timestamp
+        - name: student
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Student ID (for private resources)
+      responses:
+        '200':
+          description: File download
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Invalid signature or unauthorized
+
+components:
+  schemas:
+    ResourceType:
+      type: string
+      enum: [syllabus, textbook, past_paper, video, article, user_upload]
+    Visibility:
+      type: string
+      enum: [public, private, pending_review]
+    ResourceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        resource_type:
+          $ref: '#/components/schemas/ResourceType'
+        title:
+          type: string
+        source_url:
+          type: string
+          format: uri
+          nullable: true
+        file_path:
+          type: string
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        admin_approved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
