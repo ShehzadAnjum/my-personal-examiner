@@ -1,0 +1,63 @@
+name: topic-explanation-page-structure
+description: |
+  Topic explanation page 9-component PhD-level framework for /teaching/[topicId] route.
+  MUST USE when: generating topic explanations, creating definition sections, writing core principles,
+  formatting real-world examples, designing visual aids/diagrams, creating worked examples,
+  documenting common misconceptions, building practice problems, listing related concepts,
+  implementing version switchers, adding personalization buttons (Simpler/Detail/Examples/Exam Focus/Visual),
+  building admin regenerate features, formatting collapsible sections, text selection menus.
+  Covers: ExplanationView, ExplanationSection components, 9-component framework,
+  definition formatting, key terms, misconception structure (3-part), practice problem difficulty badges,
+  bookmark functionality, Resource Bank v1 badge, admin section regeneration.
+version: 1.0.0
+author: Claude
+created: 2026-01-05
+last_updated: 2026-01-05
+tags:
+  - frontend
+  - teaching
+  - explanation
+  - 9-component-framework
+  - phd-level
+  - content-generation
+  - definition
+  - core-principles
+  - misconceptions
+  - practice-problems
+  - visual-aids
+  - worked-examples
+  - related-concepts
+  - ExplanationView
+  - ExplanationSection
+triggers:
+  - /teaching/[topicId]
+  - topic explanation
+  - 9-component framework
+  - definition section
+  - core principles
+  - real-world examples
+  - visual aids
+  - worked examples
+  - common misconceptions
+  - practice problems
+  - related concepts
+  - explanation content
+  - PhD-level explanation
+  - ExplanationView
+  - ExplanationSection
+  - version switcher
+  - personalization buttons
+  - admin regenerate
+  - Resource Bank explanation
+  - misconception format
+  - practice question format
+  - collapsible sections
+  - generate explanation
+  - topic content
+dependencies:
+  - shadcn/ui
+  - lucide-react
+  - tailwindcss
+  - markdown
+tested: true
+working: true
