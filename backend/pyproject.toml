@@ -12,6 +12,8 @@ dependencies = [
     "sqlmodel>=0.0.22",
     "psycopg2-binary>=2.9.9",
     "alembic>=1.13.0",
+    # Vector Storage (Embedding Integration - Feature 010)
+    "pgvector>=0.3.0",
     # Authentication & Security
     "python-jose[cryptography]>=3.3.0",
     "passlib[bcrypt]>=1.7.4",
@@ -29,6 +31,22 @@ dependencies = [
     "pypdf>=5.1.0",
     "email-validator>=2.3.0",
     "bcrypt>=4.0.0,<5.0.0",
+    # Encryption (Resource Bank - API key encryption)
+    "cryptography>=41.0.0",
+    # Resource Bank - File Storage (Feature 007)
+    "pytesseract>=0.3.13",
+    "pdf2image>=1.17.0",
+    "youtube-transcript-api>=0.6.2",
+    "boto3>=1.35.0",
+    "celery[redis]>=5.4.0",
+    "pyclamd>=0.4.0",
+    "redis>=5.2.0",
+    "pypdf2>=3.0.1",
+    # OpenAI Agents SDK (Feature 008)
+    "openai-agents>=0.0.7",
+    # CLI Framework (Feature 008)
+    "typer>=0.15.0",
+    "rich>=13.9.0",  # For CLI output formatting
 ]
 
 [project.optional-dependencies]
@@ -38,6 +56,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest-asyncio>=0.24.0",
     "httpx>=0.27.0",
+    "moto[s3]>=5.0.0",  # AWS S3 mocking for tests
 
     # Code Quality
     "ruff>=0.8.0",
@@ -46,7 +65,12 @@ dev = [
     # Type Stubs
     "types-passlib>=1.7.7",
     "types-python-jose>=3.3.4",
+    "types-redis>=4.6.0",
+    "boto3-stubs[s3]>=1.35.0",
 ]
+
+[project.scripts]
+syllabus-cli = "src.cli.syllabus_cli:app"
 
 [build-system]
 requires = ["hatchling"]

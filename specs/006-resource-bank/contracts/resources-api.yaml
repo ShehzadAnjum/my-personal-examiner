@@ -1,0 +1,547 @@
+openapi: 3.1.0
+info:
+  title: Resource Bank API
+  description: API for managing shared educational resources (explanations) with versioning
+  version: 1.0.0
+  contact:
+    name: My Personal Examiner
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+tags:
+  - name: Resources
+    description: Shared explanation resources
+  - name: Admin
+    description: Admin-only resource management
+  - name: LLM Config
+    description: Student LLM API key configuration
+
+paths:
+  /resources/explanations/{syllabus_point_id}:
+    get:
+      summary: Get explanation for a topic
+      description: |
+        Retrieves the explanation for a syllabus point. Returns v1 (admin) by default,
+        or the student's preferred version if they have one.
+        Checks local cache first, falls back to database.
+      tags:
+        - Resources
+      operationId: getExplanation
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+        - name: version
+          in: query
+          description: Specific version to retrieve (optional)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Explanation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExplanationResponse'
+        '404':
+          description: No explanation exists for this topic
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /resources/explanations/{syllabus_point_id}/generate:
+    post:
+      summary: Generate personalized explanation
+      description: |
+        Generates a new personalized version (v2+) using the student's own API key.
+        Requires the student to have configured an LLM API key.
+      tags:
+        - Resources
+      operationId: generatePersonalizedExplanation
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneratePersonalizedRequest'
+      responses:
+        '201':
+          description: Personalized explanation generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExplanationResponse'
+        '400':
+          description: Invalid request or no API key configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '402':
+          description: API key invalid or quota exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /resources/explanations/{syllabus_point_id}/versions:
+    get:
+      summary: List available versions
+      description: Returns all available versions for a topic (v1 + student's versions)
+      tags:
+        - Resources
+      operationId: listVersions
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      responses:
+        '200':
+          description: List of available versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionListResponse'
+      security:
+        - bearerAuth: []
+
+  /resources/sync-status:
+    get:
+      summary: Check cache sync status
+      description: Returns whether local cache needs synchronization with database
+      tags:
+        - Resources
+      operationId: getSyncStatus
+      responses:
+        '200':
+          description: Sync status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStatusResponse'
+      security:
+        - bearerAuth: []
+
+  /resources/sync:
+    post:
+      summary: Trigger cache sync
+      description: Triggers synchronization from database to local cache
+      tags:
+        - Resources
+      operationId: triggerSync
+      responses:
+        '200':
+          description: Sync completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResultResponse'
+      security:
+        - bearerAuth: []
+
+  # Admin Endpoints
+  /admin/resources/generate-v1:
+    post:
+      summary: Generate baseline (v1) explanation
+      description: |
+        Admin-only endpoint to generate baseline content using system LLM credentials.
+        Creates v1 explanation that all students can access.
+      tags:
+        - Admin
+      operationId: generateV1Explanation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateV1Request'
+      responses:
+        '201':
+          description: V1 explanation generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExplanationResponse'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: V1 already exists (use regenerate)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /admin/resources/{id}/regenerate:
+    post:
+      summary: Regenerate v1 explanation
+      description: |
+        Admin-only endpoint to regenerate an existing v1 explanation.
+        Preserves all student v2+ versions.
+      tags:
+        - Admin
+      operationId: regenerateV1Explanation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: V1 explanation regenerated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExplanationResponse'
+        '403':
+          description: Admin access required
+        '404':
+          description: Explanation not found
+      security:
+        - bearerAuth: []
+
+  # LLM Config Endpoints
+  /student/llm-config:
+    get:
+      summary: Get LLM configuration status
+      description: |
+        Returns which LLM providers the student has configured.
+        Never returns actual API keys, only masked indicators.
+      tags:
+        - LLM Config
+      operationId: getLLMConfig
+      responses:
+        '200':
+          description: LLM configuration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMConfigStatusResponse'
+      security:
+        - bearerAuth: []
+
+    post:
+      summary: Save LLM API key
+      description: |
+        Saves an LLM API key for a provider. Key is encrypted at rest.
+        Only the last 4 characters are ever displayed.
+      tags:
+        - LLM Config
+      operationId: saveLLMConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveLLMConfigRequest'
+      responses:
+        '201':
+          description: API key saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMConfigSavedResponse'
+        '400':
+          description: Invalid API key format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /student/llm-config/{provider}:
+    delete:
+      summary: Remove LLM API key
+      description: Permanently removes the API key for a provider
+      tags:
+        - LLM Config
+      operationId: deleteLLMConfig
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/LLMProvider'
+      responses:
+        '204':
+          description: API key removed
+        '404':
+          description: No API key configured for this provider
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    SyllabusPointId:
+      name: syllabus_point_id
+      in: path
+      required: true
+      description: UUID of the syllabus point
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    LLMProvider:
+      type: string
+      enum:
+        - openai
+        - anthropic
+        - google
+
+    GeneratedBy:
+      type: string
+      enum:
+        - system
+        - student
+
+    TopicExplanation:
+      type: object
+      description: The 9-component explanation content
+      properties:
+        definition:
+          type: string
+          description: Clear, concise definition
+        concept_explanation:
+          type: string
+          description: Detailed explanation of the concept
+        real_world_examples:
+          type: array
+          items:
+            type: string
+          description: Practical examples
+        diagrams:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              description:
+                type: string
+              data:
+                type: object
+        common_misconceptions:
+          type: array
+          items:
+            type: object
+            properties:
+              misconception:
+                type: string
+              correction:
+                type: string
+        exam_tips:
+          type: array
+          items:
+            type: string
+        related_topics:
+          type: array
+          items:
+            type: string
+        practice_questions:
+          type: array
+          items:
+            type: object
+        summary:
+          type: string
+      required:
+        - definition
+        - concept_explanation
+        - summary
+
+    ExplanationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        syllabus_point_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        content:
+          $ref: '#/components/schemas/TopicExplanation'
+        generated_by:
+          $ref: '#/components/schemas/GeneratedBy'
+        llm_provider:
+          $ref: '#/components/schemas/LLMProvider'
+        llm_model:
+          type: string
+        token_cost:
+          type: integer
+        quality_rating:
+          type: number
+          format: float
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        is_cached:
+          type: boolean
+          description: Whether served from cache
+      required:
+        - id
+        - syllabus_point_id
+        - version
+        - content
+        - generated_by
+        - llm_provider
+        - llm_model
+        - created_at
+        - is_cached
+
+    GeneratePersonalizedRequest:
+      type: object
+      properties:
+        style:
+          type: string
+          enum:
+            - simpler
+            - detailed
+            - more_examples
+            - exam_focused
+          description: Style preference for personalization
+        provider:
+          $ref: '#/components/schemas/LLMProvider'
+          description: Which provider to use (must have key configured)
+      required:
+        - style
+
+    GenerateV1Request:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        provider:
+          $ref: '#/components/schemas/LLMProvider'
+          description: Which system provider to use
+      required:
+        - syllabus_point_id
+
+    VersionListResponse:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              version:
+                type: integer
+              generated_by:
+                $ref: '#/components/schemas/GeneratedBy'
+              created_at:
+                type: string
+                format: date-time
+              is_mine:
+                type: boolean
+                description: Whether this is the current student's version
+
+    SyncStatusResponse:
+      type: object
+      properties:
+        needs_sync:
+          type: boolean
+        stale_count:
+          type: integer
+          description: Number of cache entries needing refresh
+        last_sync_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    SyncResultResponse:
+      type: object
+      properties:
+        synced_count:
+          type: integer
+        failed_count:
+          type: integer
+        duration_ms:
+          type: integer
+
+    LLMConfigStatusResponse:
+      type: object
+      properties:
+        configs:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                $ref: '#/components/schemas/LLMProvider'
+              is_configured:
+                type: boolean
+              key_hint:
+                type: string
+                description: Last 4 characters of key (e.g., "****abcd")
+                nullable: true
+              is_active:
+                type: boolean
+              usage_this_month:
+                type: integer
+
+    SaveLLMConfigRequest:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/LLMProvider'
+        api_key:
+          type: string
+          minLength: 10
+          description: The full API key (will be encrypted)
+      required:
+        - provider
+        - api_key
+
+    LLMConfigSavedResponse:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/LLMProvider'
+        key_hint:
+          type: string
+          description: Last 4 characters shown
+        saved_at:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+      required:
+        - error
+        - message

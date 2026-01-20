@@ -146,8 +146,10 @@ def create_syllabus_point(
 
 @router.get("", response_model=list[SyllabusPointResponse])
 def list_syllabus_points(
-    subject_code: str | None = Query(None, description="Filter by subject code"),
-    code_prefix: str | None = Query(None, description="Filter by code prefix (e.g., '9708.1')"),
+    subject_code: str | None = Query(None, description="Filter by subject code (deprecated)"),
+    subject_id: UUID | None = Query(None, description="Filter by subject UUID (deprecated)"),
+    syllabus_id: UUID | None = Query(None, description="Filter by syllabus UUID (preferred)"),
+    code_prefix: str | None = Query(None, description="Filter by code prefix (e.g., '1.1')"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=200, description="Items per page"),
     db: Session = Depends(get_session),
@@ -155,22 +157,34 @@ def list_syllabus_points(
     """
     List syllabus points with optional filtering
 
-    Supports filtering by:
-    - subject_code: Get syllabus points for a specific subject
+    Feature: 008-academic-level-hierarchy (T049)
+
+    Supports filtering by (in order of preference):
+    - syllabus_id: Get syllabus points for a specific syllabus (PREFERRED)
+    - subject_id: Get syllabus points for a specific subject (deprecated)
+    - subject_code: Get syllabus points for a specific subject by code (deprecated)
     - code_prefix: Get syllabus points matching a code prefix
 
     Returns paginated results (default 50 per page, max 200).
 
     Examples:
-        GET /api/syllabus?subject_code=9708
-        GET /api/syllabus?subject_code=9708&code_prefix=9708.1
+        GET /api/syllabus?syllabus_id=uuid (preferred)
+        GET /api/syllabus?subject_id=uuid (deprecated)
+        GET /api/syllabus?subject_code=9708 (deprecated)
+        GET /api/syllabus?syllabus_id=uuid&code_prefix=1.1
     """
     # Build query
     stmt = select(SyllabusPoint)
 
-    # Apply filters
-    if subject_code:
-        # Lookup subject
+    # Apply filters - prefer syllabus_id over subject_id over subject_code
+    if syllabus_id:
+        # New preferred filter: by syllabus UUID
+        stmt = stmt.where(SyllabusPoint.syllabus_id == syllabus_id)
+    elif subject_id:
+        # Deprecated: filter by subject UUID
+        stmt = stmt.where(SyllabusPoint.subject_id == subject_id)
+    elif subject_code:
+        # Deprecated: lookup subject by code
         subject_stmt = select(Subject).where(Subject.code == subject_code)
         subject = db.exec(subject_stmt).first()
         if subject:

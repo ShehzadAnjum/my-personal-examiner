@@ -1,0 +1,515 @@
+openapi: 3.1.0
+info:
+  title: Learning Path API
+  description: API for tracking and managing student learning progress
+  version: 1.0.0
+  contact:
+    name: My Personal Examiner
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+tags:
+  - name: Learning Path
+    description: Student learning progress tracking
+  - name: Bookmarks
+    description: Topic bookmark management
+
+paths:
+  /learning-path:
+    get:
+      summary: Get student's learning progress
+      description: |
+        Returns the complete learning path for the authenticated student.
+        Includes all topics viewed, time spent, mastery levels, and bookmarks.
+      tags:
+        - Learning Path
+      operationId: getLearningPath
+      parameters:
+        - name: mastery_level
+          in: query
+          description: Filter by mastery level
+          required: false
+          schema:
+            $ref: '#/components/schemas/MasteryLevel'
+        - name: bookmarked_only
+          in: query
+          description: Return only bookmarked topics
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Learning path data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningPathResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/track-view:
+    post:
+      summary: Record topic view
+      description: |
+        Records that the student viewed a topic explanation.
+        Increments view count and updates last_viewed_at.
+        Called automatically when student opens an explanation.
+      tags:
+        - Learning Path
+      operationId: trackView
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackViewRequest'
+      responses:
+        '200':
+          description: View tracked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackViewResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/track-time:
+    post:
+      summary: Record time spent
+      description: |
+        Records time spent on a topic. Called when student leaves the page.
+        Accumulates to total_time_spent_seconds.
+      tags:
+        - Learning Path
+      operationId: trackTime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackTimeRequest'
+      responses:
+        '200':
+          description: Time tracked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackTimeResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/{syllabus_point_id}:
+    get:
+      summary: Get progress for specific topic
+      description: Returns learning progress for a single topic
+      tags:
+        - Learning Path
+      operationId: getTopicProgress
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      responses:
+        '200':
+          description: Topic progress data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopicProgressResponse'
+        '404':
+          description: No progress recorded for this topic
+      security:
+        - bearerAuth: []
+
+    patch:
+      summary: Update topic progress
+      description: |
+        Update specific fields of topic progress.
+        Used for manually setting mastery level or preferred version.
+      tags:
+        - Learning Path
+      operationId: updateTopicProgress
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProgressRequest'
+      responses:
+        '200':
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopicProgressResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/summary:
+    get:
+      summary: Get learning summary statistics
+      description: |
+        Returns aggregated statistics about the student's learning progress.
+        Includes total topics viewed, time spent, mastery distribution.
+      tags:
+        - Learning Path
+      operationId: getLearningStats
+      responses:
+        '200':
+          description: Learning statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningSummaryResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/recommendations:
+    get:
+      summary: Get topic recommendations
+      description: |
+        Returns personalized topic recommendations based on learning path.
+        Suggests topics to review or new topics to explore.
+      tags:
+        - Learning Path
+      operationId: getRecommendations
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum recommendations to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 5
+      responses:
+        '200':
+          description: Topic recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+      security:
+        - bearerAuth: []
+
+  # Bookmark Endpoints
+  /learning-path/bookmarks:
+    get:
+      summary: Get all bookmarks
+      description: Returns all bookmarked topics for the student
+      tags:
+        - Bookmarks
+      operationId: getBookmarks
+      responses:
+        '200':
+          description: List of bookmarked topics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkListResponse'
+      security:
+        - bearerAuth: []
+
+  /learning-path/{syllabus_point_id}/bookmark:
+    post:
+      summary: Add bookmark
+      description: Bookmarks a topic for quick access
+      tags:
+        - Bookmarks
+      operationId: addBookmark
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      responses:
+        '201':
+          description: Bookmark added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkResponse'
+        '409':
+          description: Already bookmarked
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Remove bookmark
+      description: Removes a topic from bookmarks
+      tags:
+        - Bookmarks
+      operationId: removeBookmark
+      parameters:
+        - $ref: '#/components/parameters/SyllabusPointId'
+      responses:
+        '204':
+          description: Bookmark removed
+        '404':
+          description: Topic was not bookmarked
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    SyllabusPointId:
+      name: syllabus_point_id
+      in: path
+      required: true
+      description: UUID of the syllabus point
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    MasteryLevel:
+      type: string
+      enum:
+        - not_started
+        - learning
+        - familiar
+        - mastered
+
+    TopicProgress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        syllabus_point_id:
+          type: string
+          format: uuid
+        syllabus_point_name:
+          type: string
+          description: Name of the topic for display
+        view_count:
+          type: integer
+          minimum: 0
+        total_time_spent_seconds:
+          type: integer
+          minimum: 0
+        total_time_spent_display:
+          type: string
+          description: Human-readable time (e.g., "15 min")
+        last_viewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        preferred_version:
+          type: integer
+          minimum: 1
+        is_bookmarked:
+          type: boolean
+        mastery_level:
+          $ref: '#/components/schemas/MasteryLevel'
+        has_personalized_version:
+          type: boolean
+          description: Whether student has v2+ version
+      required:
+        - id
+        - syllabus_point_id
+        - view_count
+        - total_time_spent_seconds
+        - preferred_version
+        - is_bookmarked
+        - mastery_level
+
+    LearningPathResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopicProgress'
+        total:
+          type: integer
+          description: Total number of items (before pagination)
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    TrackViewRequest:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        explanation_version:
+          type: integer
+          minimum: 1
+          description: Which version was viewed
+      required:
+        - syllabus_point_id
+
+    TrackViewResponse:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        new_view_count:
+          type: integer
+        mastery_level:
+          $ref: '#/components/schemas/MasteryLevel'
+        mastery_changed:
+          type: boolean
+          description: Whether mastery level was upgraded
+
+    TrackTimeRequest:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        duration_seconds:
+          type: integer
+          minimum: 1
+          maximum: 7200
+          description: Time spent in seconds (max 2 hours per session)
+      required:
+        - syllabus_point_id
+        - duration_seconds
+
+    TrackTimeResponse:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        new_total_seconds:
+          type: integer
+        mastery_level:
+          $ref: '#/components/schemas/MasteryLevel'
+        mastery_changed:
+          type: boolean
+
+    TopicProgressResponse:
+      type: object
+      properties:
+        progress:
+          $ref: '#/components/schemas/TopicProgress'
+
+    UpdateProgressRequest:
+      type: object
+      properties:
+        preferred_version:
+          type: integer
+          minimum: 1
+        mastery_level:
+          $ref: '#/components/schemas/MasteryLevel'
+      description: At least one field must be provided
+
+    LearningSummaryResponse:
+      type: object
+      properties:
+        total_topics_available:
+          type: integer
+          description: Total topics in syllabus
+        topics_viewed:
+          type: integer
+          description: Topics viewed at least once
+        topics_bookmarked:
+          type: integer
+        total_time_spent_seconds:
+          type: integer
+        total_time_spent_display:
+          type: string
+          description: Human-readable (e.g., "2 hours 30 min")
+        mastery_distribution:
+          type: object
+          properties:
+            not_started:
+              type: integer
+            learning:
+              type: integer
+            familiar:
+              type: integer
+            mastered:
+              type: integer
+        completion_percentage:
+          type: number
+          format: float
+          description: Percentage of topics viewed
+        streak_days:
+          type: integer
+          description: Consecutive days with activity
+
+    RecommendationsResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              syllabus_point_id:
+                type: string
+                format: uuid
+              syllabus_point_name:
+                type: string
+              reason:
+                type: string
+                enum:
+                  - never_viewed
+                  - needs_review
+                  - related_to_recent
+                  - weak_area
+              priority:
+                type: integer
+                minimum: 1
+                maximum: 10
+                description: Higher = more important
+
+    BookmarkListResponse:
+      type: object
+      properties:
+        bookmarks:
+          type: array
+          items:
+            type: object
+            properties:
+              syllabus_point_id:
+                type: string
+                format: uuid
+              syllabus_point_name:
+                type: string
+              bookmarked_at:
+                type: string
+                format: date-time
+              mastery_level:
+                $ref: '#/components/schemas/MasteryLevel'
+
+    BookmarkResponse:
+      type: object
+      properties:
+        syllabus_point_id:
+          type: string
+          format: uuid
+        bookmarked_at:
+          type: string
+          format: date-time

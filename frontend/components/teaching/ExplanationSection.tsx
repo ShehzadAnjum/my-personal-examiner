@@ -61,6 +61,9 @@ export interface ExplanationSectionProps {
   /** Optional icon to display before title */
   icon?: ReactNode;
 
+  /** Optional action button (e.g., admin regenerate) - rendered outside trigger to avoid button nesting */
+  action?: ReactNode;
+
   /** Optional CSS class for custom styling */
   className?: string;
 }
@@ -78,6 +81,7 @@ export function ExplanationSection({
   children,
   defaultExpanded = false,
   icon,
+  action,
   className = '',
 }: ExplanationSectionProps) {
   return (
@@ -88,12 +92,19 @@ export function ExplanationSection({
       className={className}
     >
       <AccordionItem value="item-1" className="border rounded-lg px-4">
-        <AccordionTrigger className="text-xl font-semibold hover:no-underline">
-          <div className="flex items-center gap-2">
-            {icon && <span className="text-muted-foreground">{icon}</span>}
-            <span>{title}</span>
-          </div>
-        </AccordionTrigger>
+        <div className="flex items-center justify-between">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline flex-1">
+            <div className="flex items-center gap-2">
+              {icon && <span className="text-muted-foreground">{icon}</span>}
+              <span>{title}</span>
+            </div>
+          </AccordionTrigger>
+          {action && (
+            <div className="flex-shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+              {action}
+            </div>
+          )}
+        </div>
         <AccordionContent className="text-base leading-relaxed pb-4 pt-2">
           {children}
         </AccordionContent>
@@ -119,14 +130,18 @@ export function ExplanationSectionAlwaysExpanded({
   title,
   children,
   icon,
+  action,
   className = '',
 }: Omit<ExplanationSectionProps, 'defaultExpanded'>) {
   return (
     <div className={`border rounded-lg p-6 w-full max-w-none min-w-0 overflow-visible ${className}`}>
-      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 break-words">
-        {icon && <span className="text-muted-foreground">{icon}</span>}
-        <span className="break-words">{title}</span>
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold flex items-center gap-2 break-words">
+          {icon && <span className="text-muted-foreground">{icon}</span>}
+          <span className="break-words">{title}</span>
+        </h3>
+        {action && <div className="flex-shrink-0 ml-2">{action}</div>}
+      </div>
       <div className="text-base leading-relaxed w-full max-w-none min-w-0 overflow-visible break-words">{children}</div>
     </div>
   );

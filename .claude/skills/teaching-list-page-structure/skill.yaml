@@ -1,0 +1,44 @@
+name: teaching-list-page-structure
+description: |
+  Teaching page list view structure and formatting for /teaching route.
+  MUST USE when: creating topic browsers, building syllabus lists, formatting topic cards,
+  designing accordion sections for topics, implementing topic search interfaces,
+  creating section headers (Economics 9708 sections 1-6), styling topic code badges,
+  adding "Explained" indicators, building quick stats footers, implementing cache badges.
+  Covers: TopicBrowser, TopicCard, TopicSearch components, gradient headers, accordion layout.
+version: 1.0.0
+author: Claude
+created: 2026-01-05
+last_updated: 2026-01-05
+tags:
+  - frontend
+  - teaching
+  - ui-structure
+  - formatting
+  - next.js
+  - topic-browser
+  - topic-list
+  - syllabus-sections
+  - topic-cards
+  - accordion
+  - shadcn-ui
+triggers:
+  - /teaching page
+  - topic browser
+  - topic list
+  - syllabus sections
+  - topic cards
+  - section accordion
+  - topic search
+  - Economics 9708 sections
+  - teaching page layout
+  - browse topics
+  - learning outcomes preview
+  - TopicBrowser component
+  - TopicCard component
+dependencies:
+  - shadcn/ui
+  - lucide-react
+  - tailwindcss
+tested: true
+working: true
