@@ -1,0 +1,416 @@
+openapi: 3.1.0
+info:
+  title: Embedding Integration API
+  description: API for embedding generation and semantic search
+  version: 1.0.0
+
+servers:
+  - url: /api
+    description: Backend API
+
+paths:
+  /embeddings/generate/{subject_id}:
+    post:
+      summary: Generate embeddings for all syllabus topics in a subject
+      operationId: generateEmbeddings
+      tags:
+        - Embeddings
+      parameters:
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Subject ID to generate embeddings for
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force_regenerate:
+                  type: boolean
+                  default: false
+                  description: Regenerate even if embeddings exist
+      responses:
+        '202':
+          description: Embedding job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbeddingJobResponse'
+        '400':
+          description: Invalid subject ID or no topics found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Subject not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /embeddings/status/{job_id}:
+    get:
+      summary: Check embedding generation job status
+      operationId: getEmbeddingJobStatus
+      tags:
+        - Embeddings
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Embedding job ID
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbeddingJobResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /embeddings/retry/{job_id}:
+    post:
+      summary: Retry failed embeddings from a job
+      operationId: retryFailedEmbeddings
+      tags:
+        - Embeddings
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Embedding job ID with failed items
+      responses:
+        '202':
+          description: Retry job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbeddingJobResponse'
+        '400':
+          description: No failed items to retry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search/semantic:
+    post:
+      summary: Semantic search across syllabus topics
+      operationId: semanticSearch
+      tags:
+        - Search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticSearchRequest'
+      responses:
+        '200':
+          description: Search results ranked by similarity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticSearchResponse'
+        '400':
+          description: Invalid search query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /embeddings/align:
+    post:
+      summary: Align external content to syllabus topics
+      operationId: alignContent
+      tags:
+        - Alignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentAlignmentRequest'
+      responses:
+        '200':
+          description: Alignment results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentAlignmentResponse'
+        '400':
+          description: Invalid content or no embedded topics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    EmbeddingJobResponse:
+      type: object
+      required:
+        - id
+        - subject_id
+        - status
+        - total_items
+        - completed_items
+        - failed_items
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID
+        subject_id:
+          type: string
+          format: uuid
+          description: Subject being embedded
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed, partial]
+          description: Job status
+        job_type:
+          type: string
+          description: Type of embedding job
+        total_items:
+          type: integer
+          description: Total items to embed
+        completed_items:
+          type: integer
+          description: Successfully embedded count
+        failed_items:
+          type: integer
+          description: Failed embedding count
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Job start time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Job completion time
+        error_message:
+          type: string
+          nullable: true
+          description: Error details if failed
+        failed_item_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: IDs of failed items for retry
+
+    SemanticSearchRequest:
+      type: object
+      required:
+        - query
+        - subject_id
+      properties:
+        query:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: Natural language search query
+          example: "market failure externalities"
+        subject_id:
+          type: string
+          format: uuid
+          description: Subject to search within
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 5
+          description: Maximum results to return
+        min_similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          default: 0.5
+          description: Minimum similarity threshold (0-1)
+
+    SemanticSearchResponse:
+      type: object
+      required:
+        - query
+        - results
+        - search_time_ms
+      properties:
+        query:
+          type: string
+          description: Original search query
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+          description: Ranked search results
+        search_time_ms:
+          type: integer
+          description: Search execution time in milliseconds
+        total_embedded_topics:
+          type: integer
+          description: Total topics with embeddings in subject
+
+    SearchResult:
+      type: object
+      required:
+        - topic_id
+        - code
+        - title
+        - similarity
+      properties:
+        topic_id:
+          type: string
+          format: uuid
+          description: Topic ID
+        code:
+          type: string
+          description: Topic code (e.g., "1.1")
+        title:
+          type: string
+          description: Topic title
+        description:
+          type: string
+          nullable: true
+          description: Topic description
+        section_title:
+          type: string
+          nullable: true
+          description: Parent section title
+        similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Cosine similarity score (0-1)
+
+    ContentAlignmentRequest:
+      type: object
+      required:
+        - content
+        - subject_id
+      properties:
+        content:
+          type: string
+          minLength: 50
+          maxLength: 10000
+          description: Content to align (e.g., textbook chapter)
+        subject_id:
+          type: string
+          format: uuid
+          description: Subject to align against
+        content_title:
+          type: string
+          maxLength: 200
+          description: Optional title for the content
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 5
+          description: Maximum matching topics to return
+        min_similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          default: 0.6
+          description: Minimum similarity for alignment
+
+    ContentAlignmentResponse:
+      type: object
+      required:
+        - content_preview
+        - alignments
+        - processing_time_ms
+      properties:
+        content_preview:
+          type: string
+          maxLength: 200
+          description: First 200 chars of content
+        alignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlignmentResult'
+          description: Matching topics ranked by similarity
+        processing_time_ms:
+          type: integer
+          description: Processing time in milliseconds
+        confidence:
+          type: string
+          enum: [high, medium, low]
+          description: Overall alignment confidence
+
+    AlignmentResult:
+      type: object
+      required:
+        - topic_id
+        - code
+        - title
+        - similarity
+      properties:
+        topic_id:
+          type: string
+          format: uuid
+          description: Matched topic ID
+        code:
+          type: string
+          description: Topic code
+        title:
+          type: string
+          description: Topic title
+        similarity:
+          type: number
+          format: float
+          description: Similarity score
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error details
+
+tags:
+  - name: Embeddings
+    description: Embedding generation and management
+  - name: Search
+    description: Semantic search operations
+  - name: Alignment
+    description: Content-to-syllabus alignment

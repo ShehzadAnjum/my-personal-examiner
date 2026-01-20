@@ -37,10 +37,27 @@ Resource Bank Models (007):
 Academic Level Hierarchy Models (008):
 - AcademicLevel: Qualification types (A-Level, O-Level, IGCSE, IB)
 - Syllabus: Syllabus versions with codes and year ranges
+
+Syllabus Agents SDK Models (008-syllabus-agents-sdk):
+- CommandWord: Cambridge command words for examiner
+- AssessmentObjective: AO1, AO2, AO3 definitions and weightings
+- PaperTemplate: Paper structure, marks, duration
+
+Auth Routing Models (009):
+- LoginAttempt: Rate limiting for login attempts
+- ActivityLog: Resource activity tracking for admin dashboard
+
+Embedding Integration Models (010):
+- EmbeddingJob: Track bulk embedding generation jobs
 """
 
 from src.models.academic_level import AcademicLevel, DEFAULT_ACADEMIC_LEVELS
+from src.models.activity_log import ActivityLog, ActivityType
+from src.models.assessment_objective import AssessmentObjective
+from src.models.embedding_job import EmbeddingJob, EmbeddingJobStatus, EmbeddingJobType
 from src.models.attempt import Attempt
+from src.models.command_word import CommandWord
+from src.models.login_attempt import LoginAttempt
 from src.models.attempted_question import AttemptedQuestion
 from src.models.coaching_session import CoachingSession
 from src.models.enums import (
@@ -65,10 +82,11 @@ from src.models.student import Student
 from src.models.student_learning_path import StudentLearningPath
 from src.models.student_llm_config import StudentLLMConfig
 from src.models.student_resource_preference import StudentResourcePreference
+from src.models.paper_template import PaperTemplate
 from src.models.study_plan import StudyPlan
 from src.models.subject import Subject, SubjectSetupStatus
 from src.models.syllabus import Syllabus
-from src.models.syllabus_point import SyllabusPoint
+from src.models.syllabus_point import SyllabusPoint, UnitType
 from src.models.syllabus_point_resource import SyllabusPointResource
 
 __all__ = [
@@ -113,4 +131,17 @@ __all__ = [
     "AcademicLevel",
     "DEFAULT_ACADEMIC_LEVELS",
     "Syllabus",
+    # Syllabus Agents SDK (008-syllabus-agents-sdk)
+    "CommandWord",
+    "AssessmentObjective",
+    "PaperTemplate",
+    "UnitType",
+    # Auth Routing (009)
+    "LoginAttempt",
+    "ActivityLog",
+    "ActivityType",
+    # Embedding Integration (010)
+    "EmbeddingJob",
+    "EmbeddingJobStatus",
+    "EmbeddingJobType",
 ]

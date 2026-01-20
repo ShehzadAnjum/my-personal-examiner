@@ -23,6 +23,7 @@ print("🔑 GEMINI_API_KEY:", "✓ Present" if os.getenv("GEMINI_API_KEY") else 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 # Application metadata
 app = FastAPI(
@@ -152,6 +153,7 @@ async def shutdown_event() -> None:
 # Router registration
 # Phase 3 (US1): Authentication (register)
 from src.routes import academic_levels  # Academic Level Hierarchy (008)
+from src.routes import activities  # Activity logging (009 - Admin Dashboard)
 from src.routes import admin_resources  # Resource Bank admin review (007 - US4)
 from src.routes import admin_setup  # Admin setup wizard (Admin-First Topic Generation)
 from src.routes import auth
@@ -169,6 +171,8 @@ from src.routes import resource_tagging  # Resource Bank tagging (007 - US6)
 from src.routes import subjects
 from src.routes import syllabus
 from src.routes import teaching  # Phase III US1: Teacher Agent
+from src.routes import embeddings  # Embedding Integration (010)
+from src.routes import search  # Semantic Search (010)
 
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(auth_extra.router, tags=["auth-extra"])  # Better-auth student lookup
@@ -180,6 +184,7 @@ app.include_router(syllabus.router, tags=["syllabus"])  # Phase II US7: Syllabus
 app.include_router(subjects.router, tags=["subjects"])  # Phase II: Subject listing
 app.include_router(resources.router, tags=["resources"])  # Resource Bank US1: View Explanations
 app.include_router(resource_sync.router, tags=["resource-sync"])  # Resource Bank sync (007 - US2)
+app.include_router(activities.router, tags=["activities"])  # Activity logging (009)
 app.include_router(admin_resources.router, tags=["admin-resources"])  # Admin review (007 - US4)
 app.include_router(admin_setup.router, tags=["admin-setup"])  # Admin setup wizard
 app.include_router(resource_tagging.router, tags=["resource-tagging"])  # Admin tagging (007 - US6)
@@ -189,5 +194,21 @@ app.include_router(coaching.router, tags=["coaching"])  # Phase III US2: Coach A
 app.include_router(marking.router, tags=["marking"])  # Phase III US4: Marker Agent
 app.include_router(feedback.router, tags=["feedback"])  # Phase III US5: Reviewer Agent
 app.include_router(planning.router, tags=["planning"])  # Phase III US6: Planner Agent
+app.include_router(embeddings.router, tags=["embeddings"])  # Embedding Integration (010)
+app.include_router(search.router, tags=["search"])  # Semantic Search (010)
+app.include_router(search.align_router, tags=["alignment"])  # Content Alignment (010)
+
+# Serve uploaded files statically
+# Files are stored in backend/backend/resources/ directory (relative path: backend/resources/...)
+resources_dir = Path(__file__).parent.parent / "backend" / "resources"
+if resources_dir.exists():
+    app.mount("/files/resources", StaticFiles(directory=str(resources_dir)), name="resources")
+    print(f"📁 Serving resource files from: {resources_dir}")
+
+# Also serve from uploads directory if it exists
+uploads_dir = Path(__file__).parent.parent / "uploads"
+if uploads_dir.exists():
+    app.mount("/files/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+    print(f"📁 Serving upload files from: {uploads_dir}")
 
 # Phase 6 (US4): app.include_router(students.router, prefix="/api", tags=["students"])
